@@ -1,7 +1,24 @@
-{% extends "base.html" %}
-{% block head %}Task 1{% endblock %}
-
-{% block body %}
-
-
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   <nav>
+  <ul>
+    {% for link in nav_links %}
+      <li><a href="{{ link['url'] }}">{{ link['name'] }}</a></li>
+    {% endfor %}
+    <nav>
+  <ul>
+    {% for link in nav_links %}
+      <li><a href="{{ link['url'] }}">{{ link['name'] }}</a></li>
+    {% endfor %}
+  </ul>
+</nav>
+  </ul>
+</nav>
+</body>
+</html>

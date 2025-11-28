@@ -4,6 +4,39 @@ from flask import Flask, render_template, request, redirect, url_for
 app = Flask(__name__)
 
 
+my_list = ['foo', 'bar', 'baz', 'quux']
+indices = [0, 2, 3]
+selected = [my_list[i] for i in indices]
+print(selected) # Output: ['foo', 'baz', 'quux']
+
+
+nav_links = [
+    {"name": "Home", "url": "/"},
+    {"name": "About Us", "url": "/about-us"},
+    {"name": "Privacy", "url": "/privacy"},
+    {"name": "Dashboard", "url": "/dashboard"},
+    {"name": "Login", "url": "/login"},
+    {"name": "Register", "url": "/register"},
+    {"name": "Logout", "url": "/logout"},
+    {"name": "Admin Dashboard", "url": "/admin_dashboard"},
+    {"name": "Zoo Booking", "url": "/zoo_booking"},
+    {"name": "Hotel Booking", "url": "/hotel_booking"},
+    {"name": "Manage Zoo", "url": "/manage_zoo"},
+    {"name": "Manage Hotel", "url": "/manage_hotel"},
+    {"name": "Success", "url": "/success"},
+    {"name": "Failure", "url": "/failure"},
+    ]
+
+home = [nav_links[i] for i in (0, 1, 2)]  # Home, About Us, Privacy
+login = [nav_links[i] for i in (0, 1, 2, 5)]  # Home, About Us, Privacy, Register
+register = [nav_links[i] for i in (0, 1, 2, 4)]  # Home, About Us, Privacy, Login
+dashboard = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
+admin_nav_links = nav_links  # All links for admin
+privacy = [nav_links[i] for i in (0,)]  # Home link only
+about_us = [nav_links[i] for i in (0, 2)]  # Home, Privacy
+hotel_booking = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
+zoo_booking = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
+print(login)
 
 @app.route('/')
 def home():

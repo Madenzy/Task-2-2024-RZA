@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, flash
+from datetime import datetime, date
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
-
+app.secret_key = 'RZA_Task_2_Secret_Key'
 
 my_list = ['foo', 'bar', 'baz', 'quux']
 indices = [0, 2, 3]
@@ -60,8 +63,56 @@ def dashboard():
 def login():
     return render_template('login.html', nav_links=login_nav_links)
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email'].lower()
+        phone = request.form['phone']
+        dob_str = request.form['dob']
+        address = request.form['address']
+        password = request.form['password']
+        confirm_password = request.form.get('confirm_password')
+
+        # ------------------------ VALIDATIONS ------------------------
+        #check that name is correct
+        if not username or len(username) < 2:
+            flash('Please enter a valid name (at least 2 characters).', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        # --- Validate passwords ---
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        if not username.isalpha():
+            flash('Username must contain only alphabetic characters.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        
+        #--- Validate password strength ---
+        if len(password) < 8:
+            flash('Password must be at least 8 characters.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        #----validate dob to make sure its not in the future or they are at least 16years--- 
+        dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
+        today = date.today()
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if dob > today:
+            flash('Date of Birth cannot be in the future.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        if age < 16:
+            flash('You must be at least 16 years old to register.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        
+        #------- age validation max age 100years --- 
+        if age > 100:
+            flash('Please enter a valid Date of Birth. You cannot be 100yrs old', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        
+        #------- Validate address ---
+        if not address or len(address) < 5:
+            flash('Please enter a valid address (at least 5 characters).', 'danger')
+            return render_template('register.html', nav_links=register_links)
+        return redirect(url_for('login'))
+
     return render_template('register.html', nav_links=register_links)
 
 @app.route('/logout')

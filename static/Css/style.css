@@ -1,3 +1,9 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
 .header-container{
     display: flex;
     flex-direction: row;
@@ -12,6 +18,64 @@
     text-decoration: none;
     color: white;
 }
+
+
+
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    }
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.logo-text h1 {
+    font-size: 2rem;
+    color: yellow;
+}
+
+.logo-text p {
+    font-size: 2rem;
+    color: black;
+}
+
+.navigation ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.navigation ul li a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navigation ul li a:hover {
+    color: white;
+    }
+
+
+
+
+
+
+
+
+
 
 body{
     background: rgb(0, 0, 0);

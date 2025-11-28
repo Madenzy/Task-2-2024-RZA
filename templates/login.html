@@ -1,24 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-   <nav>
-  <ul>
-    {% for link in nav_links %}
-      <li><a href="{{ link['url'] }}">{{ link['name'] }}</a></li>
-    {% endfor %}
-    <nav>
-  <ul>
-    {% for link in nav_links %}
-      <li><a href="{{ link['url'] }}">{{ link['name'] }}</a></li>
-    {% endfor %}
-  </ul>
-</nav>
-  </ul>
-</nav>
-</body>
-</html>
+{% extends "base.html" %}
+{% block head %}Task 1{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-image: url("/static/Images/donnie-ray-crisp-66zrT0dJ7Mc-unsplash.jpg");
+        
+    }
+</style>
+<link rel="stylesheet" href="/static/Css/register.css">
+<div class="login-container">
+    <h2>Login</h2>
+    <form method="POST" action="{{ url_for('login') }}">
+        <input type="email" id="email" name="email" placeholder="Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
+        <div>  
+            <p>Do not have an account? <a href="{{ url_for('register') }}">Singup</a></p>
+        </div><button type="submit">Login</button>
+    </form>
+    <!--<p style="margin-top:12px; text-align:center;">
+        <a href="">Forgot your password?</a>
+    </p>-->
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,105 @@
+
+
+html, body {
+    height: 100%;
+    background-image: url(/static/images/rob-potter-Jt16Nz5wRJY-unsplash.jpg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* Header */
+
+/* Main Content */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+}
+
+/* Register container */
+.register-container, 
+.login-container {
+    background: #d9d9d983;
+    border-radius: 20px;
+    padding: 40px 50px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    max-width: 520px;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.register-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(255, 255, 255, 0.1);
+}
+
+.register-container h2 {
+    color: #000000;
+    font-size: 28px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input,
+select {
+    background: #D9D9D9;
+    border: 1px solid #333;
+    color: #eee;
+    padding: 12px 15px;
+    border-radius: 30px;
+    font-size: 15px;
+    transition: 0.2s ease;
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: #5e08a5a1;
+    box-shadow: 0 0 8px rgba(0, 230, 168, 0.3);
+}
+
+label {
+    font-size: 14px;
+    text-align: left;
+    color: #bbb;
+    margin-top: 10px;
+}
+
+button {
+    background: #5e08a5a1;
+    border: none;
+    color: #111;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.25s ease-in-out;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #12b60d;
+    transform: scale(1.05);
+}
+
+.error {
+    color: #ff4d4d;
+    background: rgba(255, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+

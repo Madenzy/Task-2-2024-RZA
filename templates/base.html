@@ -20,18 +20,13 @@
         <h1>Riget Zoo Adventures</h1>
       </div>
     <nav class="navigation">
-      <ul>
-        <li><a href="{{ url_for('home') }}" id="home">Home</a></li>
-        <li><a href="{{ url_for('about_us') }}" id="about">About</a></li>
-        <li><a href="{{ url_for('login') }}" id="login">Login</a></li>
-        <li><a href="{{ url_for('register') }}" id="register">Register</a></li>
-        
-        
-        <li><a href="{{ url_for('privacy') }}" id="privacy-policy">Privacy</a></li>
-        <li><a href="{{ url_for('dashboard') }}" id="student-dashboard">Dashboard</a></li>
-        <li><a href="{{ url_for('admin_dashboard') }}" id="admin-dashboard">Admin Dashboard</a></li>
-        <li><a href="{{ url_for('logout') }}" id="logout">Sign Out</a></li>
-      </ul>
+      {% if nav_links %}
+        <ul>
+          {% for link in nav_links %}
+            <li><a href="{{ link['url'] }}">{{ link['name'] }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
 
     </nav>
   </header>

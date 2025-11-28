@@ -1,0 +1,6 @@
+body{
+    background-image: url(/static/images/image.png);
+    background-size: cover;
+    background-position: 20% 30% ;
+    background-repeat: no-repeat;
+}

@@ -13,6 +13,9 @@ body{
     font-family: 'Jua', sans-serif;
     text-align: center;
 }
+.logo-text{
+    display: none;
+}
 
 .bottons{
     display: flex;

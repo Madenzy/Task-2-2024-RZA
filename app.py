@@ -3,6 +3,8 @@ from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import os
+import re
+from models import db
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
@@ -12,7 +14,7 @@ indices = [0, 2, 3]
 selected = [my_list[i] for i in indices]
 print(selected) # Output: ['foo', 'baz', 'quux']
 
-
+#--- nav links setup ---
 nav_links = [
     {"name": "Home", "url": "/"},
     {"name": "About Us", "url": "/about-us"},
@@ -39,6 +41,18 @@ privacy_links = [nav_links[i] for i in (0,)]  # Home link only
 about_us_links = [nav_links[i] for i in (0, 2)]  # Home, Privacy
 hotel_booking_links = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
 zoo_booking_links = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
+
+def is_valid_password(password):
+    """
+    Validate that the password:
+    - Has at least 1 uppercase letter
+    - Has at least 1 lowercase letter
+    - Has at least 1 number
+    - Has at least 1 special character
+    - Is at least 8 characters long
+    """
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$'
+    return bool(re.match(pattern, password))
 
 
 @app.route('/')
@@ -111,6 +125,19 @@ def register():
         if not address or len(address) < 5:
             flash('Please enter a valid address (at least 5 characters).', 'danger')
             return render_template('register.html', nav_links=register_links)
+        
+        if not is_valid_password(password):
+            flash('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.', 'danger')
+            return render_template('register.html', nav_links=register_links)
+
+
+
+
+
+
+
+
+
         return redirect(url_for('login'))
 
     return render_template('register.html', nav_links=register_links)

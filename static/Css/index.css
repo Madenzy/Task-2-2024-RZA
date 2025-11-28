@@ -1,0 +1,46 @@
+body{
+    background-image: url(/static/images/hidde-rensink-Erzyy3Gy2LU-unsplash.jpg);
+}
+
+.h1-text{
+    color:aliceblue;
+    font-size: 6rem;
+    max-width: 900px;
+}
+.h2-text{
+    color: yellow;
+    font-size: 2rem;
+    font-family: 'Jua', sans-serif;
+    text-align: center;
+}
+
+.bottons{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+.buttons a{
+    text-decoration: none;
+    background-color: #302d42c5;
+    font-size: 1.5rem;
+    color: white;
+    align-self: center;
+    padding: 10px 10px;
+    font-family: 'Inter', sans-serif;
+    border-radius: 20px;
+}
+.buttons{
+    justify-self: center;
+}
+
+#home,#login,#register,#student-dashboard,#admin-dashboard,#logout{
+    display: none;
+}
+
+.navigation{
+    position: relative;
+    z-index: 999;
+    left: 5;
+    top: 10;
+}

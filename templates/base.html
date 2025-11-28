@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block head %}Task 1{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="/static/Css/style.css">
+  
+</head>
+
+<body>
+  <header class="header-container">
+    <div class="logo">
+      <img src="/static/Images/elephant.png" alt="GibJohn Logo">
+      
+    </div>
+    <div class="logo-text">
+        <h1>Riget Zoo Adventures</h1>
+      </div>
+    <nav class="navigation">
+      <ul>
+        <li><a href="{{ url_for('home') }}" id="home">Home</a></li>
+        <li><a href="{{ url_for('about_us') }}" id="about">About</a></li>
+        <li><a href="{{ url_for('login') }}" id="login">Login</a></li>
+        <li><a href="{{ url_for('register') }}" id="register">Register</a></li>
+        
+        
+        <li><a href="{{ url_for('privacy') }}" id="privacy-policy">Privacy</a></li>
+        <li><a href="{{ url_for('dashboard') }}" id="student-dashboard">Dashboard</a></li>
+        <li><a href="{{ url_for('admin_dashboard') }}" id="admin-dashboard">Admin Dashboard</a></li>
+        <li><a href="{{ url_for('logout') }}" id="logout">Sign Out</a></li>
+      </ul>
+
+    </nav>
+  </header>
+
+  <main>
+    {% block body %}
+    {% endblock %}
+  </main>
+
+  <footer>
+    <div class="footer-text">
+        <p>&copy; 2025 RZA. All rights reserved.</p>
+    </div>
+    
+  </footer>
+
+</html>

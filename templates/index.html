@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}Home{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="/static/Css/index.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+<div class="h1-text">
+    <h1>Riget Zoo Adventure</h1>
+</div>
+<div class="h2-text">
+    <h2>Step into a world of Wonder</h2>
+</div>
+<div class="buttons">
+    <a href="{{ url_for('register') }}" >Register</a>
+    <a href="{{ url_for('login') }}" >Login</a>
+</div>
+
+{% endblock %}

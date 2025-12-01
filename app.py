@@ -8,14 +8,14 @@ from models import db, Student
 from configure import configure_app
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from sqlalchemy.orm import joinedload
-
+from bookings import hotel_bp
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
 login_manager = LoginManager()
 configure_app(app)
 login_manager.init_app(app)
-    
+app.register_blueprint(hotel_bp)
 
 
 

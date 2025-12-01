@@ -2,6 +2,94 @@
 {% block head %}Task 1{% endblock %}
 
 {% block body %}
+<link rel="stylesheet" href="/static/Css/hotel.css">
 
+
+<div class="page-wrap">
+  <div class="hotel-shell">
+    <div class="glass-panel">
+      <h1>Hotel Booking</h1>
+    </div>
+
+    <aside class="filter-card">
+      <h3>Add Search Criteria</h3>
+      <div class="filter-field">
+        <span class="filter-label">Bedrooms</span>
+        <div class="stepper">
+          <button type="button">−</button>
+          <input type="text" value="2" >
+          <button type="button">+</button>
+        </div>
+      </div>
+      <div class="filter-field">
+        <span class="filter-label">Bathrooms</span>
+        <div class="stepper">
+          <button type="button">−</button>
+          <input type="text" value="2" >
+          <button type="button">+</button>
+        </div>
+      </div>
+      <div class="filter-field">
+        <span class="filter-label">Beds</span>
+        <div class="stepper">
+          <button type="button">−</button>
+          <input type="text" value="2" >
+          <button type="button">+</button>
+        </div>
+      </div>
+      <div class="filter-field select-field">
+        <span class="filter-label">Room Type</span>
+        <select>
+          <option>Family</option>
+          <option>Single</option>
+          <option>Double</option>
+          <option>Suite</option>
+        </select>
+      </div>
+    </aside>
+
+    <main class="booking-card">
+      <div class="pill-group">
+        <div class="pill">Number of people: 0</div>
+        <div class="pill">
+          <label for="check_in">Check-in date</label>
+          <input type="date" id="check_in" name="check_in">
+        </div>
+        <div class="pill">
+          <label for="check_out">Check-out date</label>
+          <input type="date" id="check_out" name="check_out">
+        </div>
+        <button class="search-btn" type="button">Search</button>
+      </div>
+
+      <div class="rooms-panel">
+        <div class="rooms-head">
+          <span>Select Room:</span>
+          <span>Room type: Family</span>
+        </div>
+        <div class="rooms-list">
+          <div>2 bedrooms, 2 bathrooms, 2 beds, £400 night</div>
+          <div>2 bedrooms, 2 bathrooms, 2 beds, £420 night</div>
+          <div>2 bedrooms, 2 bathrooms, 2 beds, £400 night</div>
+          <div>2 bedrooms, 1 bathrooms, 2 beds, £350 night</div>
+        </div>
+        <div class="link"><a href="#">Show all family rooms</a></div>
+      </div>
+    </main>
+
+    <aside class="gallery-card">
+      <img src="/static/images/hotel-room.jpg" alt="Family room preview">
+      <div class="caption">
+        Family Room: Designed for parents and children, typically with multiple beds,
+        sometimes subdivided for privacy.
+      </div>
+    </aside>
+
+    <div class="actions">
+      <button type="button">Add zoo ticket</button>
+      <button type="button" class="primary">Continue to payment</button>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

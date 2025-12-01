@@ -1,13 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from datetime import datetime, date
+from datetime import datetime
 
 db = SQLAlchemy()
 
-# ------------------ User ------------------
+# ------------------ Users ------------------
 class Student(UserMixin, db.Model):
     __tablename__ = 'users'
-    ID = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)  # renamed from ID to id
     name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True, nullable=False)
     address = db.Column(db.String(200))
@@ -16,30 +16,15 @@ class Student(UserMixin, db.Model):
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50))  # user, admin, teacher, etc.
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    def get_id(self):
-        return f"student-{self.ID}"
 
-#---------------- Hotel Booking -------------
-class HotelBooking(db.Model):
-    __tablename__ = 'hotel_booking'
-    bookingID = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer, db.ForeignKey('users.ID'))
-    roomID = db.Column(db.String(100), db.ForeignKey('rooms.ID'))
-    checkInDate = db.Column(db.Date)
-    checkOutDate = db.Column(db.Date)
-    numberOfGuests = db.Column(db.Integer)
-    totalPrice = db.Column(db.Float)
-    bookingDate = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('Student', backref='hotel_bookings')
-    room = db.relationship('Rooms', backref='hotel_bookings')
     def get_id(self):
-        return f"hotelbooking-{self.bookingID}"
+        return f"student-{self.id}"
+
 
 # ------------------ Rooms ------------------
-class Rooms(db.Model):
+class Room(db.Model):
     __tablename__ = 'rooms'
-    ID = db.Column(db.String(100), primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     room_type = db.Column(db.String(100))
     capacity = db.Column(db.Integer)
     availability = db.Column(db.Boolean, default=True)
@@ -50,38 +35,63 @@ class Rooms(db.Model):
     bedrooms = db.Column(db.Integer)
 
     def get_id(self):
-        return f"room-{self.ID}"
+        return f"room-{self.id}"
 
-#------------Tickets ----------------
-class Tickets(db.Model):
+
+# ------------------ Hotel Bookings ------------------
+class HotelBooking(db.Model):
+    __tablename__ = 'hotel_bookings'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    room_id = db.Column(db.String(100), db.ForeignKey('rooms.id'))
+    check_in_date = db.Column(db.Date)
+    check_out_date = db.Column(db.Date)
+    number_of_guests = db.Column(db.Integer)
+    total_price = db.Column(db.Float)
+    booking_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('Student', backref='hotel_bookings')
+    room = db.relationship('Room', backref='hotel_bookings')
+
+    def get_id(self):
+        return f"hotelbooking-{self.id}"
+
+
+# ------------------ Tickets ------------------
+class Ticket(db.Model):
     __tablename__ = 'tickets'
-    TicketID = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer, db.ForeignKey('users.ID'))
-    visitDate = db.Column(db.Date)
-    numberOfPeople = db.Column(db.Integer)
-    totalPrice = db.Column(db.Float)
-    bookingDate = db.Column(db.DateTime, default=datetime.utcnow)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    visit_date = db.Column(db.Date)
+    number_of_people = db.Column(db.Integer)
+    total_price = db.Column(db.Float)
+    booking_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('Student', backref='tickets')
-    def get_id(self):
-        return f"ticket-{self.TicketID}"
 
-# ------------------ XP ------------------
-class Rewards(db.Model):
+    def get_id(self):
+        return f"ticket-{self.id}"
+
+
+# ------------------ Rewards ------------------
+class Reward(db.Model):
     __tablename__ = 'rewards'
-    ID = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer, db.ForeignKey('users.ID'))
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     rewards_level = db.Column(db.Integer)
     rewards_points = db.Column(db.Integer)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-#-------Ticket Prices -------------
-class TicketPrices(db.Model):
+    user = db.relationship('Student', backref='rewards')
+
+
+# ------------------ Ticket Prices ------------------
+class TicketPrice(db.Model):
     __tablename__ = 'ticket_prices'
-    ID = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     adult = db.Column(db.String(50))  # e.g., Child, Adult, Senior
     child = db.Column(db.String(50))
     family = db.Column(db.String(50))
 
     def get_id(self):
-        return f"ticketprice-{self.ID}"
+        return f"ticketprice-{self.id}"

@@ -47,10 +47,10 @@ login_nav_links = [nav_links[i] for i in (0, 1, 5, 2)]
 register_links = [nav_links[i] for i in (0, 1, 2, 4)]  # Home, About Us, Privacy, Login
 dashboard_links = [nav_links[i] for i in ( 8,9,1, 2,6)]  # Home, About Us, Privacy, Logout
 admin_nav_links = nav_links  # All links for admin
-privacy_links = [nav_links[i] for i in (0,)]  # Home link only
-about_us_links = [nav_links[i] for i in (0, 2)]  # Home, Privacy
-hotel_booking_links = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
-zoo_booking_links = [nav_links[i] for i in (0, 1, 2, 6)]  # Home, About Us, Privacy, Logout
+privacy_links = [nav_links[i] for i in (0, 1, 3, 4, 5 ,2)]  # Home link only
+about_us_links = [nav_links[i] for i in (0, 1, 2, 4, 5)]  # Home, Privacy
+hotel_booking_links = [nav_links[i] for i in (0, 1, 3, 2, 6)]  # Home, About Us, Privacy, Logout
+zoo_booking_links = [nav_links[i] for i in (0, 1, 3, 2, 6)]  # Home, About Us, Privacy, Logout
 
 with app.app_context():
     db.create_all()
@@ -64,7 +64,7 @@ def seed_admin_user():
     # --- Prevent duplicate email registration ---
     existing = Student.query.filter_by(email='admin@rza.co.uk').first()
     if not existing:
-        hashed_password = generate_password_hash('Admin@123', method='sha256')
+        hashed_password = generate_password_hash('Admin@123', method='scrypt')
         new_admin = db.text(
             '''INSERT INTO users (name, email, address, dob, password, phone, role, created_at)
                VALUES (:name, :email, :address, :dob, :password, :phone, :role, :created_at)'''
@@ -131,20 +131,16 @@ def login():
         email = request.form['email'].lower()
         password = request.form['password']
 
-        user = db.session.execute(
-            db.text("SELECT * FROM users WHERE email = :email"),
-            {"email": email}
-        ).fetchone()
+        user = Student.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password, password):
-            user_obj = Student()
-            user_obj.ID = user.ID
-            login_user(user_obj)
+            login_user(user)
             flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid email or password.', 'danger')
-            return render_template('login.html', nav_links=login_nav_links)
+
+        flash('Invalid email or password.', 'danger')
+        return render_template('login.html', nav_links=login_nav_links)
+
     return render_template('login.html', nav_links=login_nav_links)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -214,7 +210,7 @@ def register():
             flash('Email already registered in the system.', 'danger')
             return render_template('register.html', nav_links=register_links)
         #--- Hash the password ---
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='scrypt')
         #--- Create new user ---
         new_user = db.text(
             '''INSERT INTO users (name, email, address, dob, password, phone, role, created_at)
@@ -250,10 +246,20 @@ def register():
 @app.route('/logout')
 @login_required
 def logout():
-    """Log the current user out and redirect to home."""
     logout_user()
-    flash("Logged out successfully.", "success")
-    return redirect(url_for('index'))
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('home'))
+
+def get_user_type(user):
+    """Determine the user type based on the role."""
+    if user.role == 'user':
+        return 'user'
+    elif user.role == 'admin':
+        return 'admin'
+    else:
+        return None
+    
+
 @app.route('/account/settings')
 @login_required
 def account_settings():
@@ -262,14 +268,12 @@ def account_settings():
     user_type = get_user_type(user)
     if not user_type:
         flash('Unable to determine account type for settings.', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
     redirect_target = {
-        'student': 'student_dashboard',
-        'tutor': 'teacher_dashboard',
+        'user': 'dashboard',
         'admin': 'admin_dashboard',
-        'parent': 'parent_dashboard',
-    }.get(user_type, 'index')
+    }.get(user_type, 'home')
 
     return render_template(
         'account_settings.html',
@@ -277,19 +281,32 @@ def account_settings():
         user_type=user_type,
         redirect_target=redirect_target,
     )
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    #make sure only users with role 'user' can access
     user = db.session.execute(
-        db.text("SELECT * FROM users WHERE ID = :id"),
-        {"id": current_user.ID}
+        db.text("SELECT * FROM users WHERE id = :id"),
+        {"id": current_user.id}
     ).fetchone()
+
+    if not user:
+        flash('User not found.', 'danger')
+        return redirect(url_for('login'))
+
     if user.role != 'user':
         flash('Access denied. Admins cannot access user dashboard.', 'danger')
         return redirect(url_for('admin_dashboard'))
-    #make sure user is authenticated
-    return render_template('dashboard.html', nav_links=dashboard_links, users=user, name=user.name)
+
+    
+
+    return render_template(
+        'dashboard.html',
+        nav_links=dashboard_links,
+        user=user,
+        
+    )
+
 
 @app.route('/admin_dashboard')
 @login_required
@@ -297,26 +314,32 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', nav_links=admin_nav_links)
 
 @app.route('/zoo_booking')
+@login_required
 def zoo_booking():
     return render_template('zoo_booking.html', nav_links=zoo_booking_links)
 
 @app.route('/success')
+@login_required
 def success():
     return render_template('success.html', nav_links=dashboard_links)
 
 @app.route('/failure')
+@login_required
 def failure():
     return render_template('failure.html', nav_links=dashboard_links)
 
 @app.route('/hotel_booking')
+@login_required
 def hotel_booking():
     return render_template('hotel_booking.html', nav_links=hotel_booking_links)
 
 @app.route('/manage_zoo')
+@login_required
 def manage_bookings():
     return render_template('manage_zoo.html', nav_links=zoo_booking_links)
 
 @app.route('/manage_hotel')
+@login_required
 def manage_hotel():
     return render_template('manage_hotel.html', nav_links=hotel_booking_links)
 

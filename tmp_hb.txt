@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block head %}Task 1{% endblock %}
+
+{% block body %}
+
+
+{% endblock %}

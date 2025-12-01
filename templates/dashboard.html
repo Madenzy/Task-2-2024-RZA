@@ -7,24 +7,30 @@
 <section>
   <div class="dashboard-container">
     <div class="top-bar">
-      <div class="greeting"><h1>Hi, {{ users.name }}!</h1></div>
+      <div class="greeting"><h1>Hi, {{ user.name }}!</h1></div>
       <div class="action-buttons">
         <div class="settings">
-          <p><img href"/static/image/settings.png"><a href="{{ url_for('account_settings') }}">Account Settings</a></p>
+          <p><img href="/static/image/settings.png"><a href="{{ url_for('account_settings') }}">Account Settings</a></p>
         </div>
-        <button class="action-btn">Book Hotel</button>
-        <button class="action-btn">Book zoo Tickets</button>
+        <button class="action-btn"><a href="{{url_for('hotel_booking')}}">Book Hotel</a></button>
+        <button class="action-btn"><a href="{{url_for('zoo_booking')}}">Book zoo Tickets</a></button>
       </div>
     </div>
 
     <div class="rewards-card">
       <div class="card" style="min-width:360px;">
-        <div style="font-weight:600;font-size:1.05rem;margin-bottom:6px;">Rewards level: <span style="color:#2566fc">lockedin</span></div>
-        <div style="margin-bottom: 4px;">Loyalty Points: <span style="font-weight:500;">826</span></div>
-        <div style="font-size:0.97rem; margin-bottom:3px;">Next Level</div>
-        <div class="rewards-progress">
-          <div class="progress-bar" style="width:67%;"></div>
-        </div>
+      <div style="font-weight:600;font-size:1.05rem;margin-bottom:6px;">
+        Rewards level: <span style="color:#2566fc">{{ user.rewards_level }}</span>
+      </div>
+      <div style="margin-bottom: 4px;">
+        Loyalty Points: <span style="font-weight:500;">{{ user.rewards_points }}</span>
+      </div>
+      <div style="font-size:0.97rem; margin-bottom:3px;">
+        Next Level: <strong>{{ user.next_level_name }}</strong> — {{ user.points_to_next_level }} pts to go
+      </div>
+      <div class="rewards-progress" title="{{ user.next_level_progress_percent }}%">
+        <div class="progress-bar" style="width:{{ user.next_level_progress_percent }}%;"></div>
+      </div>
       </div>
     </div>
 

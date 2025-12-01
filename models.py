@@ -1,9 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime, date
-#initialize the database
-db = SQLAlchemy()
 
+db = SQLAlchemy()
 
 # ------------------ User ------------------
 class Student(UserMixin, db.Model):
@@ -15,16 +14,11 @@ class Student(UserMixin, db.Model):
     dob = db.Column(db.Date)
     password = db.Column(db.String(255))
     phone = db.Column(db.String(20))
-    ParentEmail = db.Column(db.String(100), db.ForeignKey('parent.ParentEmail'))
-    role = db.Column(db.bool(50))  # user, 'admin'
+    role = db.Column(db.String(50))  # user, admin, teacher, etc.
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-
-    # Flask-Login required
     def get_id(self):
         return f"student-{self.ID}"
-    
-    
+
 #---------------- Hotel Booking -------------
 class HotelBooking(db.Model):
     __tablename__ = 'hotel_booking'
@@ -40,8 +34,7 @@ class HotelBooking(db.Model):
     user = db.relationship('Student', backref='hotel_bookings')
     room = db.relationship('Rooms', backref='hotel_bookings')
     def get_id(self):
-        return f"hotelbooking-{self.BookingID}"
-    
+        return f"hotelbooking-{self.bookingID}"
 
 # ------------------ Rooms ------------------
 class Rooms(db.Model):
@@ -56,10 +49,8 @@ class Rooms(db.Model):
     beds = db.Column(db.Integer)
     bedrooms = db.Column(db.Integer)
 
-
     def get_id(self):
         return f"room-{self.ID}"
-    
 
 #------------Tickets ----------------
 class Tickets(db.Model):
@@ -71,16 +62,15 @@ class Tickets(db.Model):
     totalPrice = db.Column(db.Float)
     bookingDate = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('user', backref='tickets')
+    user = db.relationship('Student', backref='tickets')
     def get_id(self):
         return f"ticket-{self.TicketID}"
-
 
 # ------------------ XP ------------------
 class Rewards(db.Model):
     __tablename__ = 'rewards'
     ID = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer, db.ForeignKey('use.ID'))
+    userID = db.Column(db.Integer, db.ForeignKey('users.ID'))
     rewards_level = db.Column(db.Integer)
     rewards_points = db.Column(db.Integer)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -95,4 +85,3 @@ class TicketPrices(db.Model):
 
     def get_id(self):
         return f"ticketprice-{self.ID}"
-

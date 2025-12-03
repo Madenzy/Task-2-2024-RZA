@@ -1,28 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime, date
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
-import os
-import re
+from werkzeug.security import generate_password_hash
 from models import db, Student
 from configure import configure_app
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
-from sqlalchemy.orm import joinedload
+from flask_login import login_required, current_user
 from bookings import hotel_bp
+from authentication import auth_bp, login_manager
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
-login_manager = LoginManager()
 configure_app(app)
 login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+
 app.register_blueprint(hotel_bp)
+app.register_blueprint(auth_bp)
 
 
-
-my_list = ['foo', 'bar', 'baz', 'quux']
-indices = [0, 2, 3]
-selected = [my_list[i] for i in indices]
-print(selected) # Output: ['foo', 'baz', 'quux']
 
 #--- nav links setup ---
 nav_links = [
@@ -86,30 +80,6 @@ def seed_admin_user():
         print('Default admin user created.')
     else:
         print('Admin user already exists.')
-  
-def is_valid_password(password):
-    """
-    Validate that the password:
-    - Has at least 1 uppercase letter
-    - Has at least 1 lowercase letter
-    - Has at least 1 number
-    - Has at least 1 special character
-    - Is at least 8 characters long
-    """
-    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$'
-    
-    return bool(re.match(pattern, password))
-
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    # user_id will be a string, like "student-1" (from your Student.get_id)
-    # You need to parse it to get the real database ID
-    if user_id.startswith("student-"):
-        student_id = int(user_id.split("-", 1)[1])
-        return Student.query.get(student_id)
-    return None
 
 
 @app.route('/')
@@ -127,162 +97,7 @@ def privacy():
 @app.route('/the_animals')
 def the_animals():
     return render_template('the_animals.html', nav_links=about_us_links)
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email'].lower()
-        password = request.form['password']
 
-        user = Student.query.filter_by(email=email).first()
-
-        if user and check_password_hash(user.password, password):
-            login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-
-        flash('Invalid email or password.', 'danger')
-        return render_template('login.html', nav_links=login_nav_links)
-
-    return render_template('login.html', nav_links=login_nav_links)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email'].lower()
-        phone = request.form['phone']
-        dob_str = request.form['dob']
-        address = request.form['address']
-        password = request.form['password']
-        confirm_password = request.form.get('confirm_password')
-
-        # ------------------------ VALIDATIONS ------------------------
-        #check that name is correct
-        if not username or len(username) < 2:
-            flash('Please enter a valid name (at least 2 characters).', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        # --- Validate passwords ---
-        if password != confirm_password:
-            flash('Passwords do not match.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        if not username.isalpha():
-            flash('Username must contain only alphabetic characters.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        
-        #--- Validate password strength ---
-        if len(password) < 8:
-            flash('Password must be at least 8 characters.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        #----validate dob to make sure its not in the future or they are at least 16years--- 
-        dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
-        today = date.today()
-        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-        if dob > today:
-            flash('Date of Birth cannot be in the future.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        if age < 16:
-            flash('You must be at least 16 years old to register.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        
-        #------- age validation max age 100years --- 
-        if age > 100:
-            flash('Please enter a valid Date of Birth. You cannot be 100yrs old', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        
-        #------- Validate address ---
-        if not address or len(address) < 5:
-            flash('Please enter a valid address (at least 5 characters).', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        
-        if not is_valid_password(password):
-            flash('Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        '''
-            #--- Check if email already exists ---
-            existing_user = db.session.execute(db.select(db.exists().where(db.text('email') == email))).scalar()
-            if existing_user:
-                flash('Email already registered. Please use a different email.', 'danger')
-                return render_template('register.html', nav_links=register_links)   '''
-        # Check if email already exists in the users table
-        existing = db.session.execute(
-            db.text("SELECT 1 FROM users WHERE email = :email LIMIT 1"),
-            {"email": email}
-        ).fetchone()
-        if existing:
-            flash('Email already registered in the system.', 'danger')
-            return render_template('register.html', nav_links=register_links)
-        #--- Hash the password ---
-        hashed_password = generate_password_hash(password, method='scrypt')
-        #--- Create new user ---
-        new_user = db.text(
-            '''INSERT INTO users (name, email, address, dob, password, phone, role, created_at)
-               VALUES (:name, :email, :address, :dob, :password, :phone, :role, :created_at)'''
-        )
-        db.session.execute(
-            new_user,
-            {
-            'name': username,
-            'email': email,
-            'address': address,
-            'dob': dob,
-            'password': hashed_password,
-            'phone': phone,
-            'role': 'user',
-            'created_at': datetime.utcnow()
-            }
-        )
-        db.session.commit()
-
-        flash('Registration successful! Please log in.', 'success') 
-
-
-
-
-
-        return redirect(url_for('login'))
-
-    return render_template('register.html', nav_links=register_links)
-
-
-# ---------------------- LOGOUT ----------------------
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('home'))
-
-def get_user_type(user):
-    """Determine the user type based on the role."""
-    if user.role == 'user':
-        return 'user'
-    elif user.role == 'admin':
-        return 'admin'
-    else:
-        return None
-    
-
-@app.route('/account/settings')
-@login_required
-def account_settings():
-    """Unified account management page for all authenticated users."""
-    user = current_user
-    user_type = get_user_type(user)
-    if not user_type:
-        flash('Unable to determine account type for settings.', 'danger')
-        return redirect(url_for('home'))
-
-    redirect_target = {
-        'user': 'dashboard',
-        'admin': 'admin_dashboard',
-    }.get(user_type, 'home')
-
-    return render_template(
-        'account_settings.html',
-        user=user,
-        user_type=user_type,
-        redirect_target=redirect_target,
-    )
 
 @app.route('/dashboard')
 @login_required
@@ -294,7 +109,7 @@ def dashboard():
 
     if not user:
         flash('User not found.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     if user.role != 'user':
         flash('Access denied. Admins cannot access user dashboard.', 'danger')
@@ -333,6 +148,8 @@ def failure():
 @app.route('/hotel_booking')
 @login_required
 def hotel_booking():
+    #add the functions from bookings.py to filter rooms based on user input
+
     return render_template('hotel_booking.html', nav_links=hotel_booking_links)
 
 @app.route('/manage_zoo')
@@ -345,6 +162,12 @@ def manage_bookings():
 def manage_hotel():
     return render_template('manage_hotel.html', nav_links=hotel_booking_links)
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

@@ -10,7 +10,7 @@
       <div class="greeting"><h1>Hi, {{ user.name }}!</h1></div>
       <div class="action-buttons">
         <div class="settings">
-          <p><img href="/static/image/settings.png"><a href="{{ url_for('account_settings') }}">Account Settings</a></p>
+          <p><img href="/static/image/settings.png"><a href="{{ url_for('auth.account_settings') }}">Account Settings</a></p>
         </div>
         <button class="action-btn"><a href="{{url_for('hotel_booking')}}">Book Hotel</a></button>
         <button class="action-btn"><a href="{{url_for('zoo_booking')}}">Book zoo Tickets</a></button>

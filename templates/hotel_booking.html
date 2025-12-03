@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block head %}Task 1{% endblock %}
+{% block head %}Hotel booking{% endblock %}
 
 {% block body %}
 <link rel="stylesheet" href="/static/Css/hotel.css">
 
 
 <div class="page-wrap">
-  <div class="hotel-shell">
+  <form class="hotel-shell" id="hotel-search-form" action="/book_hotel" method="get">
     <div class="glass-panel">
       <h1>Hotel Booking</h1>
     </div>
@@ -16,69 +16,78 @@
       <div class="filter-field">
         <span class="filter-label">Bedrooms</span>
         <div class="stepper">
-          <button type="button">−</button>
-          <input type="text" value="2" >
-          <button type="button">+</button>
+          <button type="button" aria-label="Decrease bedrooms">-</button>
+          <input type="number" id="bedrooms" name="bedrooms" value="1" min="0" step="1">
+          <button type="button" aria-label="Increase bedrooms">+</button>
         </div>
       </div>
       <div class="filter-field">
         <span class="filter-label">Bathrooms</span>
         <div class="stepper">
-          <button type="button">−</button>
-          <input type="text" value="2" >
-          <button type="button">+</button>
+          <button type="button" aria-label="Decrease bathrooms">-</button>
+          <input type="number" id="bathrooms" name="bathrooms" value="1" min="0" step="1">
+          <button type="button" aria-label="Increase bathrooms">+</button>
         </div>
       </div>
       <div class="filter-field">
         <span class="filter-label">Beds</span>
         <div class="stepper">
-          <button type="button">−</button>
-          <input type="text" value="2" >
-          <button type="button">+</button>
+          <button type="button" aria-label="Decrease beds">-</button>
+          <input type="number" id="beds" name="beds" value="1" min="0" step="1">
+          <button type="button" aria-label="Increase beds">+</button>
         </div>
       </div>
       <div class="filter-field select-field">
         <span class="filter-label">Room Type</span>
-        <select>
-          <option>Family</option>
-          <option>Single</option>
-          <option>Double</option>
-          <option>Suite</option>
+        <select id="room_type" name="room_type">
+          <option value="family">Family</option>
+          <option value="single">Single</option>
+          <option value="double">Double</option>
+          <option value="suite">Suite</option>
         </select>
       </div>
     </aside>
 
     <main class="booking-card">
       <div class="pill-group">
-        <div class="pill">Number of people: 0</div>
+        <div class="pill-1"><label for="number_of_guests">Number of people</label>
+          <input type="number" id="number_of_guests" name="number_of_guests" value="1" min="1" required></div>
         <div class="pill">
-          <label for="check_in">Check-in date</label>
-          <input type="date" id="check_in" name="check_in">
+          <label for="check_in_date">Check-in date</label>
+          <input type="date" id="check_in_date" name="check_in_date" required>
         </div>
         <div class="pill">
-          <label for="check_out">Check-out date</label>
-          <input type="date" id="check_out" name="check_out">
+          <label for="check_out_date">Check-out date</label>
+          <input type="date" id="check_out_date" name="check_out_date" required>
         </div>
-        <button class="search-btn" type="button">Search</button>
+        <button class="search-btn" type="submit">Search</button>
       </div>
 
       <div class="rooms-panel">
         <div class="rooms-head">
           <span>Select Room:</span>
-          <span>Room type: Family</span>
+          <span>Room type: {{ request.args.get('room_type', 'Any')|capitalize }}</span>
         </div>
         <div class="rooms-list">
-          <div>2 bedrooms, 2 bathrooms, 2 beds, £400 night</div>
-          <div>2 bedrooms, 2 bathrooms, 2 beds, £420 night</div>
-          <div>2 bedrooms, 2 bathrooms, 2 beds, £400 night</div>
-          <div>2 bedrooms, 1 bathrooms, 2 beds, £350 night</div>
+          {% if rooms %}
+            {% for room in rooms %}
+              <div>
+                <input type="checkbox" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}">
+                {{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds,
+                £{{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})
+              </div>
+            {% endfor %}
+          {% else %}
+            <div>No rooms match your criteria yet.</div>
+          {% endif %}
         </div>
-        <div class="link"><a href="#">Show all family rooms</a></div>
+        <div class="link"><a href="/book_hotel">Reset filters</a></div>
       </div>
     </main>
 
     <aside class="gallery-card">
       <img src="/static/images/hotel-room.jpg" alt="Family room preview">
+      <!--diplay the preview based on the selected room type-->
       <div class="caption">
         Family Room: Designed for parents and children, typically with multiple beds,
         sometimes subdivided for privacy.
@@ -89,7 +98,7 @@
       <button type="button">Add zoo ticket</button>
       <button type="button" class="primary">Continue to payment</button>
     </div>
-  </div>
+  </form>
 </div>
 
 {% endblock %}

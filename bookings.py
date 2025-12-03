@@ -2,16 +2,87 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 from models import db, HotelBooking, Room, Student
 from datetime import datetime
+
+
+
+#--- nav links setup ---
+nav_links = [
+    {"name": "Home", "url": "/"},
+    {"name": "About Us", "url": "/about-us"},
+    {"name": "Privacy", "url": "/privacy"},
+    {"name": "Dashboard", "url": "/dashboard"},
+    {"name": "Login", "url": "/login"},
+    {"name": "Register", "url": "/register"},
+    {"name": "Logout", "url": "/logout"},
+    {"name": "Admin Dashboard", "url": "/admin_dashboard"},
+    {"name": "Zoo Booking", "url": "/zoo_booking"},
+    {"name": "Hotel Booking", "url": "/hotel_booking"},
+    {"name": "Manage Zoo", "url": "/manage_zoo"},
+    {"name": "Manage Hotel", "url": "/manage_hotel"},
+    {"name": "Success", "url": "/success"},
+    {"name": "Failure", "url": "/failure"},
+    ]
+
+home_links = [nav_links[i] for i in ( 1, 2)]  # Home, About Us, Privacy
+login_nav_links = [nav_links[i] for i in (0, 1, 5, 2)]
+register_links = [nav_links[i] for i in (0, 1, 2, 4)]  # Home, About Us, Privacy, Login
+dashboard_links = [nav_links[i] for i in ( 8,9,1, 2,6)]  # Home, About Us, Privacy, Logout
+admin_nav_links = nav_links  # All links for admin
+privacy_links = [nav_links[i] for i in (0, 1, 3, 4, 5 ,2)]  # Home link only
+about_us_links = [nav_links[i] for i in (0, 1, 2, 4, 5)]  # Home, Privacy
+hotel_booking_links = [nav_links[i] for i in (0, 1, 3, 2, 6)]  # Home, About Us, Privacy, Logout
+zoo_booking_links = [nav_links[i] for i in (0, 1, 3, 2, 6)]  # Home, About Us, Privacy, Logout
+
+# Function to filter rooms based on query parameters
+def _filter_rooms(query_params):
+
+    #filtered Room query based on the incoming request arguements.
+
+    bedrooms = query_params.get("bedrooms", type=int)
+    bathrooms = query_params.get("bathrooms", type=int)
+    beds = query_params.get("beds", type=int)
+    room_type = query_params.get("room_type")
+    guests = query_params.get("number_of_guests", type=int)
+    check_in_str = query_params.get("check_in_date")
+    check_out_str = query_params.get("check_out_date")
+
+    check_in = datetime.strptime(check_in_str, "%Y-%m-%d").date() if check_in_str else None
+    check_out = datetime.strptime(check_out_str, "%Y-%m-%d").date() if check_out_str else None
+
+    query = Room.query.filter(Room.availability.is_(True))
+
+    if guests:
+        query = query.filter(Room.capacity >= guests)
+    if room_type:
+        query = query.filter(Room.room_type.ilike(room_type))
+    if bedrooms is not None:
+        query = query.filter(Room.bedrooms >= bedrooms)
+    if bathrooms is not None:
+        query = query.filter(Room.bathrooms >= bathrooms)
+    if beds is not None:
+        query = query.filter(Room.beds >= beds)
+
+    # Exclude rooms already booked in the requested date range.
+    if check_in and check_out:
+        overlap = db.and_(
+            HotelBooking.check_in_date < check_out,
+            HotelBooking.check_out_date >=check_in,
+        )
+        query = query.filter(~Room.hotel_bookings.any(overlap))
+
+    return query.all()
+
+
 hotel_bp = Blueprint('hotel', __name__)
 @hotel_bp.route('/book_hotel', methods=['GET', 'POST'])
 @login_required
 def book_hotel():
     if request.method == 'POST':
-        user_id = request.form.get('user_id')
-        room_id = request.form.get('room_id')
         check_in_date = request.form.get('check_in_date')
         check_out_date = request.form.get('check_out_date')
         number_of_guests = request.form.get('number_of_guests')
+        room_id = request.form.get('room_id')
+        user_id = request.form.get('user_id')
 
         # Fetch room to calculate total price
         room = Room.query.get(room_id)
@@ -36,5 +107,5 @@ def book_hotel():
 
         return redirect(url_for('hotel.booking_success'))
 
-    rooms = Room.query.filter_by(availability=True).all()
-    return render_template('hotel_booking.html', rooms=rooms)
+    rooms = _filter_rooms(request.args)
+    return render_template('hotel_booking.html', rooms=rooms, nav_links=hotel_booking_links)

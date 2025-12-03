@@ -1,4 +1,4 @@
-from Flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 from models import db, HotelBooking, Room, Student
 from datetime import datetime

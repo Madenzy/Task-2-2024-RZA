@@ -4,32 +4,20 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
-.header-container{
-    display: flex;
-    flex-direction: row;
+body {
+    background: #000000;
+    background-size: cover;
 }
-
-.navigation ul{
-    display: flex;
-    gap: 10px;
-    list-style-type: none;
-}
-.navigation a{
-    text-decoration: none;
-    color: white;
-}
-
-
-
 
 .header-container {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
     padding: 15px 50px;
     overflow-x: hidden;
     overflow-y: hidden;
-    }
+}
 
 .logo {
     display: flex;
@@ -39,6 +27,7 @@ html, body {
 
 .logo img {
     height: 50px;
+    width: 50px;
 }
 
 .logo-text h1 {
@@ -51,6 +40,10 @@ html, body {
     color: black;
 }
 
+.logo-text {
+    color: yellow;
+}
+
 .navigation ul {
     list-style: none;
     display: flex;
@@ -59,46 +52,27 @@ html, body {
 
 .navigation ul li a {
     text-decoration: none;
-    color: rgb(255, 255, 255);
+    color: #ffffff;
     font-weight: 500;
     transition: color 0.3s ease;
 }
 
 .navigation ul li a:hover {
-    color: white;
-    }
-
-
-
-
-
-
-
-
-
-
-body{
-    background: rgb(0, 0, 0);
-    background-size: cover;
-
-}
-.logo img{
-    height: 50px;
-    width: 50px;
+    color: yellow;
 }
 
-footer{
-    bottom: 0;
-    position: fixed;
+footer {
+    position: relative;
     background-color: black;
     width: 100%;
+    height: 60px;
+    margin-top: 30px;
+    display: flex;
     align-items: center;
-}
-footer p{
-    color: white;
-    text-align: center;
+    justify-content: center;
 }
 
-.logo-text{
-    color: yellow;
+footer p {
+    color: white;
+    text-align: center;
 }

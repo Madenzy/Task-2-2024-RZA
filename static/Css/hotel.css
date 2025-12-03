@@ -20,6 +20,11 @@ body {
     gap: 18px;
     align-items: start;
     position: relative;
+    background: #c4c4c465;
+    max-width: 80%;
+    padding: 24px 24px 32px;
+    border-radius: 32px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
   }
   .glass-panel {
     border-radius: 26px;

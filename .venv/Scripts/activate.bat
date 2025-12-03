@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\345986\OneDrive - Milton Keynes College O365\Task-2-2024-RZA\.venv
+set VIRTUAL_ENV=C:\Users\Denzel\OneDrive\Task-2-2024-RZA\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 

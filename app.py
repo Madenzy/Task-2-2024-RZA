@@ -124,7 +124,9 @@ def about_us():
 def privacy():
     return render_template('privacy.html', nav_links=privacy_links)
 
-
+@app.route('/the_animals')
+def the_animals():
+    return render_template('the_animals.html', nav_links=about_us_links)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

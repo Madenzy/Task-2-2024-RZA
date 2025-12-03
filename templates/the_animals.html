@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block head %}
+    <title>The Animals</title>
+    <style>
+        body{
+            background-image: url(/static/images/image.png);
+            background-size: cover;
+            background-position: 20% 30% ;
+            background-repeat: no-repeat;
+        }
+        .animals-page {
+            min-height: calc(100vh - 60px);
+            padding: 40px 50px;
+            color: #ffffff;
+            background-image: url(/static/images/image.png);
+            background-size: cover;
+        }
+
+        .animals-hero {
+            max-width: 900px;
+            margin-bottom: 40px;
+        }
+
+        .animals-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: yellow;
+        }
+
+        .animals-hero p {
+            font-size: 1rem;
+            color: #f0f0f0;
+            line-height: 1.5;
+        }
+
+        .animals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .animal-card {
+            background: #11111194;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .animal-image-wrapper {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .animal-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .animal-name-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .animal-name-row h2 {
+            font-size: 1.2rem;
+            color: yellow;
+            margin: 0;
+        }
+
+        .animal-tag {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border: 1px solid #555;
+            border-radius: 15px;
+            text-transform: uppercase;
+            color: #ddd;
+        }
+
+        .animal-origin {
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+
+        .animal-description {
+            margin-top: 5px;
+            line-height: 1.4;
+            font-size: 0.9rem;
+            color: #f0f0f0;
+        }
+
+        .animal-fact {
+            color: #aaa;
+            font-size: 0.75rem;
+            font-style: italic;
+            margin-top: 6px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="animals-page">
+
+    <section class="animals-hero">
+        <h1>Meet Our Animals</h1>
+        <p>
+            Explore our diverse collection of animals from around the world — from powerful predators 
+            to gentle giants and playful creatures. Each one has a unique story and natural habitat.
+        </p>
+    </section>
+
+    <section class="animals-grid">
+
+        <!-- 1. Lion -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/photo-person-wXmkcvIOOXI-unsplash.jpg" alt="Lion">
+            </div>
+            <div class="animal-name-row">
+                <h2>Lion</h2><span class="animal-tag">Savannah</span>
+            </div>
+            <p class="animal-origin">Africa</p>
+            <p class="animal-description">Known as the “king of the jungle”, lions live in groups called prides.</p>
+            <p class="animal-fact">Fun fact: A lion’s roar can travel up to 8 km!</p>
+        </article>
+
+        <!-- 2. Elephant -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/geranimo-D1_W669KaHU-unsplash.jpg" alt="Elephant">
+            </div>
+            <div class="animal-name-row">
+                <h2>Elephant</h2><span class="animal-tag">Grasslands</span>
+            </div>
+            <p class="animal-origin">Africa & Asia</p>
+            <p class="animal-description">The largest land mammal with strong memory and social behavior.</p>
+            <p class="animal-fact">Fun fact: Elephants can recognize themselves in mirrors.</p>
+        </article>
+
+        <!-- 3. Giraffe -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/julia-taubitz-gxqNz15_RP8-unsplash.jpg" alt="Giraffe">
+            </div>
+            <div class="animal-name-row">
+                <h2>Giraffe</h2><span class="animal-tag">Savannah</span>
+            </div>
+            <p class="animal-origin">Africa</p>
+            <p class="animal-description">Tallest land animal with a long neck used for feeding on treetops.</p>
+            <p class="animal-fact">Fun fact: Their tongues can reach 45 cm in length!</p>
+        </article>
+
+        <!-- 4. Penguin -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/paul-carroll-Y-nyDv3TWm0-unsplash.jpg" alt="Penguin">
+            </div>
+            <div class="animal-name-row">
+                <h2>Penguin</h2><span class="animal-tag">Coastal</span>
+            </div>
+            <p class="animal-origin">Southern Hemisphere</p>
+            <p class="animal-description">Flightless birds that “fly” through water using their flippers.</p>
+            <p class="animal-fact">Fun fact: Penguins mate for life!</p>
+        </article>
+
+        <!-- 5. Red Panda -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/julien-mussard-OApeDBma_zY-unsplash.jpg" alt="Red Panda">
+            </div>
+            <div class="animal-name-row">
+                <h2>Red Panda</h2><span class="animal-tag">Forest</span>
+            </div>
+            <p class="animal-origin">Himalayas</p>
+            <p class="animal-description">Cute, tree-loving animals often mistaken for raccoons.</p>
+            <p class="animal-fact">Fun fact: They communicate with a “twittering” sound.</p>
+        </article>
+
+        <!-- 6. Meerkat -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/dusan-veverkolog-ah7KHxYg6Ow-unsplash.jpg" alt="Meerkat">
+            </div>
+            <div class="animal-name-row">
+                <h2>Meerkat</h2><span class="animal-tag">Desert</span>
+            </div>
+            <p class="animal-origin">Southern Africa</p>
+            <p class="animal-description">Small mammals known for standing upright while keeping watch.</p>
+            <p class="animal-fact">Fun fact: Meerkats live in groups called mobs.</p>
+        </article>
+
+        <!-- 7. Tiger -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/donnie-ray-crisp-66zrT0dJ7Mc-unsplash.jpg" alt="Tiger">
+            </div>
+            <div class="animal-name-row">
+                <h2>Tiger</h2><span class="animal-tag">Jungle</span>
+            </div>
+            <p class="animal-origin">Asia</p>
+            <p class="animal-description">Largest big cat species with powerful strength and stealth.</p>
+            <p class="animal-fact">Fun fact: No two tigers have the same stripe pattern.</p>
+        </article>
+
+        <!-- 8. Zebra -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/istockphoto-1409907042-1024x1024.jpg" alt="Zebra">
+            </div>
+            <div class="animal-name-row">
+                <h2>Zebra</h2><span class="animal-tag">Savannah</span>
+            </div>
+            <p class="animal-origin">Africa</p>
+            <p class="animal-description">Known for their black and white stripes, each zebra is unique.</p>
+            <p class="animal-fact">Fun fact: Stripes help confuse predators.</p>
+        </article>
+
+        <!-- 9. Kangaroo -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/james-wainscoat-9yoTfoHs77A-unsplash.jpg" alt="Kangaroo">
+            </div>
+            <div class="animal-name-row">
+                <h2>Kangaroo</h2><span class="animal-tag">Outback</span>
+            </div>
+            <p class="animal-origin">Australia</p>
+            <p class="animal-description">Strong jumpers that carry their babies (joeys) in a pouch.</p>
+            <p class="animal-fact">Fun fact: Kangaroos can’t walk backwards.</p>
+        </article>
+
+        <!-- 10. Flamingo -->
+        <article class="animal-card">
+            <div class="animal-image-wrapper">
+                <img src="/static/images/sharisse-bullock-2dOmHAE9VlM-unsplash.jpg" alt="Flamingo">
+            </div>
+            <div class="animal-name-row">
+                <h2>Flamingo</h2><span class="animal-tag">Wetlands</span>
+            </div>
+            <p class="animal-origin">Africa, Asia, Americas</p>
+            <p class="animal-description">Colourful birds known for standing on one leg.</p>
+            <p class="animal-fact">Fun fact: Their pink colour comes from the food they eat!</p>
+        </article>
+
+    </section>
+</div>
+{% endblock %}

@@ -156,3 +156,6 @@ booking_bp = Blueprint('booking', __name__)
 #the stripe payment gateway function
 def make_payment():
     return render_template('zoo_booking.html')
+
+
+

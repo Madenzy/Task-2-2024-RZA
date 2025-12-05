@@ -4,7 +4,12 @@
 {% block body %}
 <link rel="stylesheet" href="/static/Css/hotel.css">
 
-
+<!--the flash errors on top-->
+<style>
+    flash-message {
+        color: red;
+    }
+</style>
 <div class="page-wrap">
   <form class="hotel-shell" id="hotel-search-form" action="/book_hotel" method="get">
     <div class="glass-panel">
@@ -40,6 +45,7 @@
       <div class="filter-field select-field">
         <span class="filter-label">Room Type</span>
         <select id="room_type" name="room_type">
+          <option value="">Any</option>
           <option value="family">Family</option>
           <option value="single">Single</option>
           <option value="double">Double</option>
@@ -73,9 +79,8 @@
             {% for room in rooms %}
               <div>
                 <!--display rooms in radio boxes-->
-                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}>
-                <label for="room_{{ room.id }}">{{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds,
-                £{{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})</label>
+                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}">
+                <label for="room_{{ room.id }}">{{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds, {{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})</label>
                 
               </div>
             {% endfor %}
@@ -86,21 +91,84 @@
         <div class="link"><a href="/book_hotel">Reset filters</a></div>
       </div>
     </main>
-
-    <aside class="gallery-card">
-      <img src="/static/images/hotel-room.jpg" alt="Family room preview">
-      <!--diplay the preview based on the selected room type-->
-      <div class="caption">
-        Family Room: Designed for parents and children, typically with multiple beds,
-        sometimes subdivided for privacy.
-      </div>
-    </aside>
+      <!--preview of the selected room-->
+    <div class="room-preview">
+      <h3>Room Preview</h3>
+      <div class="caption"></div>
+    </div>
 
     <div class="actions">
       <button type="button">Add zoo ticket</button>
-      <button type="button" class="primary">Continue to payment</button>
+      <a href="{{url_for('booking.make_payment')}}" class="primary">Continue to payment</a>
     </div>
   </form>
 </div>
+<script>
+  // Stepper buttons functionality
+  document.querySelectorAll('.stepper').forEach(stepper => {
+    const decreaseBtn = stepper.querySelector('button[aria-label^="Decrease"]');
+    const increaseBtn = stepper.querySelector('button[aria-label^="Increase"]');
+    const input = stepper.querySelector('input[type="number"]');
+
+    decreaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(input.value);
+      if (currentValue > parseInt(input.min)) {
+        input.value = currentValue - parseInt(input.step);
+      }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(input.value);
+      input.value = currentValue + parseInt(input.step);
+    });
+  });
+
+  // Update room preview based on selected room type
+  const roomTypeSelect = document.getElementById('room_type');
+  const caption = document.querySelector('.caption');
+  roomTypeSelect.addEventListener('change', () => {
+    const selectedType = roomTypeSelect.value;
+    let captionText = '';
+    switch (selectedType) {
+      case 'family':
+        captionText = 'Family Room: Designed for parents and children, typically with multiple beds, sometimes subdivided for privacy.';
+        break;
+      case 'single':
+        captionText = 'Single Room: Ideal for solo travelers, featuring one bed and essential amenities for a comfortable stay.';
+        break;
+      case 'double':
+        captionText = 'Double Room: Perfect for couples or friends, equipped with two beds and additional space for relaxation.';
+        break;
+      case 'suite':
+        captionText = 'Suite: Luxurious accommodation with separate living areas, premium amenities, and enhanced comfort.';
+        break;
+      default:
+        captionText = '';
+    }
+    caption.textContent = captionText;
+  });
+  // Trigger change event on page load to set initial caption
+  roomTypeSelect.dispatchEvent(new Event('change'));
+
+  // Set minimum check-in date to today
+  const checkInDate = document.getElementById('check_in_date');
+  const today = new Date().toISOString().split('T')[0];
+  checkInDate.setAttribute('min', today);
+
+  // Set minimum check-out date based on check-in date
+  const checkOutDate = document.getElementById('check_out_date'); 
+  checkInDate.addEventListener('change', () => {
+    const checkIn = new Date(checkInDate.value);
+    const minCheckOut = new Date(checkIn);
+    minCheckOut.setDate(minCheckOut.getDate() + 1);
+    checkOutDate.setAttribute('min', minCheckOut.toISOString().split('T')[0]);
+  });
+
+  // Trigger change event on page load to set initial min check-out date
+  checkInDate.dispatchEvent(new Event('change'));
+  
+
+
+</script>
 
 {% endblock %}

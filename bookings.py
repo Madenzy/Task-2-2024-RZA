@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from models import db, HotelBooking, Room, Student
 from datetime import datetime
@@ -61,7 +61,8 @@ def _filter_rooms(query_params):
         query = query.filter(Room.bathrooms >= bathrooms)
     if beds is not None:
         query = query.filter(Room.beds >= beds)
-
+   
+    
     # Exclude rooms already booked in the requested date range.
     if check_in and check_out:
         overlap = db.and_(
@@ -89,6 +90,13 @@ def book_hotel():
         if not room:
             return "Room not found", 404
 
+         #validation for date range check in date must be in the future or today and check out date must be after check in date.
+        if not check_in_date and check_out_date and check_out_date > check_in_date:
+            flash('Check-out date must be after checkin date', 'danger')
+            return [render_template("hotel_booking.html", rooms=[], nav_links=hotel_booking_links, error="Invalid date range.")]
+        if not check_in_date and check_out_date < datetime.today().date():
+            flash('Check-in date must be today or in the future', 'danger')
+            return [render_template("hotel_booking.html", rooms=[], nav_links=hotel_booking_links, error="Check-in date must be today or in the future.")]
         # Calculate total price (simple calculation, can be improved)
         nights = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
         total_price = nights * room.price_per_night
@@ -108,4 +116,43 @@ def book_hotel():
         return redirect(url_for('hotel.booking_success'))
 
     rooms = _filter_rooms(request.args)
-    return render_template('hotel_booking.html', rooms=rooms, nav_links=hotel_booking_links)
+    return render_template('hotel_booking.html', rooms=rooms, nav_links=hotel_booking_links, flash=flash)
+
+@hotel_bp.route('/booking_success')
+@login_required
+def booking_success():
+    return render_template('booking_success.html', nav_links=hotel_booking_links)
+
+@hotel_bp.route('/booking_failure')
+@login_required
+def booking_failure():
+    return render_template('booking_failure.html', nav_links=hotel_booking_links)
+
+@hotel_bp.route('/manage_hotel')
+@login_required
+def manage_hotel():
+    bookings = HotelBooking.query.all()
+    return render_template('manage_hotel.html', bookings=bookings,  nav_links=hotel_booking_links)
+
+@hotel_bp.route('/cancel_booking/<int:booking_id>', methods=['POST'])
+@login_required
+def cancel_booking(booking_id):
+    booking = HotelBooking.query.get(booking_id)
+    if booking:
+        db.session.delete(booking)
+        db.session.commit()
+        flash('Booking cancelled successfully.', 'success')
+    else:
+        flash('Booking not found.', 'danger')
+    return redirect(url_for('hotel.manage_hotel'))
+
+def init_app(app):
+    app.register_blueprint(hotel_bp)
+
+
+booking_bp = Blueprint('booking', __name__)
+@booking_bp.route('/make_payment', methods=['GET', 'POST'])
+@login_required
+#the stripe payment gateway function
+def make_payment():
+    return render_template('zoo_booking.html')

@@ -49,6 +49,9 @@ class HotelBooking(db.Model):
     number_of_guests = db.Column(db.Integer)
     total_price = db.Column(db.Float)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
+    payment_status = db.Column(db.String(20), default="unpaid")
+    stripe_checkout_id = db.Column(db.String(120), default="")
+    payment_date = db.Column(db.DateTime)
 
     user = db.relationship('Student', backref='hotel_bookings')
     room = db.relationship('Room', backref='hotel_bookings')
@@ -66,6 +69,10 @@ class Ticket(db.Model):
     number_of_people = db.Column(db.Integer)
     total_price = db.Column(db.Float)
     booking_date = db.Column(db.DateTime, default=datetime.utcnow)
+    payment_status = db.Column(db.String(20), default="unpaid")
+    stripe_checkout_id = db.Column(db.String(120), default="")
+    stripe_payment_intent = db.Column(db.String(120), default="")
+    verify_token = db.Column(db.String(64), default="")
 
     user = db.relationship('Student', backref='tickets')
 

@@ -1,10 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import datetime, date
+import os
+import re
+import shutil
+import json
+from datetime import date, datetime
+from sqlalchemy import text
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+load_dotenv() 
 from werkzeug.security import generate_password_hash
 from models import db, Student
 from configure import configure_app
 from flask_login import login_required, current_user
-from bookings import hotel_bp
+from bookings import hotel_bp, booking_bp
 from authentication import auth_bp, login_manager
 
 app = Flask(__name__)
@@ -15,6 +25,8 @@ login_manager.login_view = 'auth.login'
 
 app.register_blueprint(hotel_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(booking_bp)
+
 
 
 

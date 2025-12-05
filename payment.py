@@ -1,126 +1,102 @@
-@app.route("/arctic/booking", methods=["GET", "POST"])
-def arctic_booking():
-    form = BookingForm()
-    form.visit_time.choices = [(slot, slot) for slot in app.config["RAW_SLOTS"]]
-    pricing_cfg = get_pricing_config()
+import os
+from datetime import datetime
 
-    if request.method == "POST" and form.validate_on_submit():
-        visit_date = form.visit_date.data
-        visit_time = form.visit_time.data.strip()
+from flask import Blueprint, current_app, flash, redirect, url_for
+from flask_login import current_user, login_required
+import stripe
 
-        if not in_event_window(visit_date):
-            flash("Selected date is outside the event window.", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
-        if not valid_time_slot(visit_time):
-            flash("Invalid time slot.", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
+from models import db, HotelBooking
 
-        qty_adult = form.qty_adult.data or 0
-        qty_child = form.qty_child.data or 0
-        qty_family = form.qty_family.data or 0
-        qty_carer = form.qty_carer.data or 0
+# Configure Stripe once on import
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY") or os.getenv("STRIPE_API_KEY") or ""
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY") or ""
+stripe.api_key = STRIPE_SECRET_KEY
 
-        qty_map = {
-            "adult": qty_adult,
-            "child": qty_child,
-            "family": qty_family,
-            "carer": qty_carer,
-        }
+payment_bp = Blueprint("payment", __name__)
 
-        total_heads = qty_adult + qty_child + (qty_family * 4) + qty_carer
 
-        if total_heads <= 0:
-            flash("Add at least one ticket.", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
+def _success_url(booking_id: int) -> str:
+    """Build an absolute success URL for Stripe redirects."""
+    return url_for("payment.hotel_payment_success", booking_id=booking_id, _external=True)
 
-        if qty_carer and (qty_adult + qty_child + qty_family * 4) <= 0:
-            flash("Carers must be booked with at least one other guest.", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
 
-        remaining = capacity_remaining(visit_date, visit_time)
-        if total_heads > remaining:
-            flash(f"Not enough capacity for that slot. Remaining: {remaining}", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
+def _cancel_url(booking_id: int) -> str:
+    """Build an absolute cancel URL for Stripe redirects."""
+    return url_for("payment.hotel_payment_cancel", booking_id=booking_id, _external=True)
 
-        promo_code = (form.promo_code.data or "").strip()
-        school_code = (pricing_cfg.get("school_promo_code") or "").strip().lower()
-        if promo_code and promo_code.strip().lower() == school_code:
-            children_count = qty_child + qty_family * 2
-            adult_count = qty_adult + qty_family * 2
-            if children_count < pricing_cfg.get("school_min_students", 0) or adult_count < 1:
-                flash(f"School promo needs at least {pricing_cfg['school_min_students']} children and 1 adult.", "error")
-                return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
 
-        amounts = compute_booking_amounts(qty_map, promo_code, pricing_cfg)
-        total_pence = amounts["total_pence"]
-        requires_payment = total_pence > 0
+@payment_bp.route("/pay/hotel/<int:booking_id>", methods=["GET"])
+@login_required
+def start_hotel_checkout(booking_id: int):
+    """Start a Stripe Checkout session for a hotel booking."""
+    booking = HotelBooking.query.get_or_404(booking_id)
 
-        if requires_payment and not STRIPE_ENABLED:
-            flash("Online card payments are not configured. Please contact support to complete this booking.", "error")
-            return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg), 503
+    # Only the booking owner (or admin) should pay
+    if booking.user_id and booking.user_id != current_user.id and getattr(current_user, "role", "") != "admin":
+        flash("You cannot pay for this booking.", "danger")
+        return redirect(url_for("hotel.manage_hotel"))
 
-        booking = Booking(
-            full_name=form.full_name.data.strip(),
-            email=form.email.data.strip(),
-            phone=form.phone.data.strip(),
-            visit_date=visit_date,
-            visit_time=visit_time,
-            qty_adult=qty_adult,
-            qty_child=qty_child,
-            qty_family=qty_family,
-            qty_carer=qty_carer,
-            promo_code=serialize_promo_codes(promo_code),
-            notes=(form.notes.data or "").strip(),
-            payment_status="unpaid" if requires_payment else "paid",
-            party_size=total_heads,
-            amount_due_pence=total_pence,
-            amount_paid_pence=0,
-            booking_fee_pence=amounts["booking_fee"],
-            discount_percent_applied=int(amounts["discount_percent"]),
-            discount_pence=amounts["discount_pence"],
-        )
-        db.session.add(booking)
-        db.session.flush()  # Assign an ID for Stripe metadata before committing.
+    # If already paid, skip Stripe
+    if booking.payment_status == "paid":
+        flash("Booking already paid.", "info")
+        return redirect(url_for("hotel.booking_success"))
 
-        if STRIPE_ENABLED and requires_payment:
-            try:
-                line_items = [
-                    {
-                        "price_data": {
-                            "currency": "gbp",
-                            "product_data": {"name": "Arctic booking (incl. discounts/fees)"},
-                            "unit_amount": total_pence,
-                        },
-                        "quantity": 1,
-                    }
-                ]
-                base_url = current_base_url()
-                session_obj = stripe.checkout.Session.create(
-                    mode="payment",
-                    payment_method_types=["card"],
-                    line_items=line_items,
-                    success_url=f"{base_url}{url_for('arctic_success')}?bid={booking.id}",
-                    cancel_url=f"{base_url}{url_for('arctic_cancel')}?bid={booking.id}",
-                    metadata={
-                        "booking_id": str(booking.id),
-                        "visit_date": str(visit_date),
-                        "visit_time": visit_time,
-                        "full_name": booking.full_name,
-                    },
-                )
-                booking.stripe_checkout_id = session_obj.id
-                db.session.commit()
-                return redirect(session_obj.url, code=303)
-            except Exception as exc:  # pragma: no cover - Stripe failure
-                db.session.rollback()
-                app.logger.error("Stripe checkout creation failed: %s", exc)
-                flash("Unable to start the payment session. No payment has been taken.", "error")
-                return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg), 502
-
+    amount_pence = int(round(float(booking.total_price) * 100))
+    # Zero-amount bookings are marked as paid automatically
+    if amount_pence <= 0 or not STRIPE_SECRET_KEY:
         booking.payment_status = "paid"
-        booking.amount_paid_pence = total_pence
+        booking.payment_date = datetime.utcnow()
         db.session.commit()
-        return redirect(url_for("arctic_success", bid=booking.id))
+        flash("Booking marked as paid.", "success")
+        return redirect(url_for("hotel.booking_success"))
 
-    return render_template("arctic/booking.html", form=form, stripe_enabled=STRIPE_ENABLED, config=app.config, pricing=pricing_cfg)
+    try:
+        session_obj = stripe.checkout.Session.create(
+            mode="payment",
+            payment_method_types=["card"],
+            customer_email=getattr(current_user, "email", None),
+            line_items=[
+                {
+                    "price_data": {
+                        "currency": "gbp",
+                        "product_data": {"name": f"Hotel booking #{booking.id}"},
+                        "unit_amount": amount_pence,
+                    },
+                    "quantity": 1,
+                }
+            ],
+            success_url=_success_url(booking.id),
+            cancel_url=_cancel_url(booking.id),
+            metadata={"booking_id": str(booking.id)},
+        )
+    except Exception as exc:
+        current_app.logger.error("Stripe checkout failed for booking %s: %s", booking.id, exc)
+        flash("Unable to start payment, please try again.", "danger")
+        return redirect(url_for("hotel.booking_failure"))
+
+    booking.stripe_checkout_id = session_obj.id
+    db.session.commit()
+    return redirect(session_obj.url, code=303)
+
+
+@payment_bp.route("/pay/hotel/<int:booking_id>/success", methods=["GET"])
+@login_required
+def hotel_payment_success(booking_id: int):
+    """Handle the user returning from Stripe after a successful payment."""
+    booking = HotelBooking.query.get_or_404(booking_id)
+    if booking.payment_status != "paid":
+        booking.payment_status = "paid"
+        booking.payment_date = datetime.utcnow()
+        db.session.commit()
+
+    flash("Payment complete. Thank you!", "success")
+    return redirect(url_for("hotel.booking_success"))
+
+
+@payment_bp.route("/pay/hotel/<int:booking_id>/cancel", methods=["GET"])
+@login_required
+def hotel_payment_cancel(booking_id: int):
+    """Handle a cancelled Stripe Checkout."""
+    flash("Payment cancelled. You can retry from your booking list.", "warning")
+    return redirect(url_for("hotel.booking_failure"))
 

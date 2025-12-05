@@ -58,6 +58,7 @@ def _default_rooms():
             "bedrooms": 1,
             "description": "Suite with lounge area and premium amenities.",
         },
+
         {
             "id": "305",
             "room_type": "suite",
@@ -67,7 +68,7 @@ def _default_rooms():
             "beds": 3,
             "bedrooms": 2,
             "description": "Luxury suite with two bedrooms and city view.",
-        }
+        },
         {
             "id": "130",
             "room_type": "single",
@@ -77,7 +78,7 @@ def _default_rooms():
             "beds": 1,
             "bedrooms": 1,
             "description": "Economy single room with essential amenities.",
-        }
+        },
         {
             "id": "210",
             "room_type": "double",

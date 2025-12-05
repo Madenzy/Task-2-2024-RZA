@@ -1,0 +1,23 @@
+<!--page to capture errors-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='Css/styles.css') }}">
+    <title>Booking Failure</title>
+    <link rel="stylesheet" href="/static/Css/register.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Booking Failed</h1>
+        <p>We're sorry, but there was an error processing your booking.</p>
+        <p>Please try again later or contact support if the issue persists.</p>
+        <!--Display the exact error they are having-->
+        <p>Error Details: {{ error_message }}</p>
+        
+        <a href="{{ url_for('home') }}" class="btn">Return to Home</a>
+    </div>
+</body>
+</html>

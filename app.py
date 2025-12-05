@@ -16,6 +16,7 @@ from configure import configure_app
 from flask_login import login_required, current_user
 from bookings import hotel_bp, booking_bp
 from authentication import auth_bp, login_manager
+from payment import payment_bp
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
@@ -26,6 +27,7 @@ login_manager.login_view = 'auth.login'
 app.register_blueprint(hotel_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(booking_bp)
+app.register_blueprint(payment_bp)
 
 
 
@@ -65,33 +67,33 @@ with app.app_context():
     # Insert new user
     
     #SEED DEFAULT ADMIN USER IF NOT EXISTS
-def seed_admin_user():
-    admin_email = 'admin@rza.co.uk'
-    # --- Prevent duplicate email registration ---
-    existing = Student.query.filter_by(email='admin@rza.co.uk').first()
-    if not existing:
-        hashed_password = generate_password_hash('Admin@123', method='scrypt')
-        new_admin = db.text(
-            '''INSERT INTO users (name, email, address, dob, password, phone, role, created_at)
-               VALUES (:name, :email, :address, :dob, :password, :phone, :role, :created_at)'''
-        )
-        db.session.execute(
-            new_admin,
-            {
-            'name': 'Admin',
-            'email': admin_email,
-            'address': 'Admin Address',
-            'dob': date(1990, 1, 1),
-            'password': hashed_password,
-            'phone': '0000000000',
-            'role': 'admin',
-            'created_at': datetime.utcnow()
-            }
-        )
-        db.session.commit()
-        print('Default admin user created.')
-    else:
-        print('Admin user already exists.')
+    def seed_admin_user():
+        admin_email = 'admin@rza.co.uk'
+        # --- Prevent duplicate email registration ---
+        existing = Student.query.filter_by(email='admin@rza.co.uk').first()
+        if not existing:
+            hashed_password = generate_password_hash('Admin@123', method='scrypt')
+            new_admin = db.text(
+                '''INSERT INTO users (name, email, address, dob, password, phone, role, created_at)
+                VALUES (:name, :email, :address, :dob, :password, :phone, :role, :created_at)'''
+            )
+            db.session.execute(
+                new_admin,
+                {
+                'name': 'Admin',
+                'email': admin_email,
+                'address': 'Admin Address',
+                'dob': date(1990, 1, 1),
+                'password': hashed_password,
+                'phone': '0000000000',
+                'role': 'admin',
+                'created_at': datetime.utcnow()
+                }
+            )
+            db.session.commit()
+            print('Default admin user created.')
+        else:
+            print('Admin user already exists.')
 
 
 @app.route('/')
@@ -155,6 +157,8 @@ def success():
 @app.route('/failure')
 @login_required
 def failure():
+    #get the failure reason from query parameter
+    flash('sorry bro you aint got it like that', 'danger')
     return render_template('failure.html', nav_links=dashboard_links)
 
 @app.route('/hotel_booking')

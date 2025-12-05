@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 from models import db, HotelBooking, Room, Student
 from datetime import datetime
 
@@ -82,8 +82,7 @@ def book_hotel():
         check_in_date = request.form.get('check_in_date')
         check_out_date = request.form.get('check_out_date')
         number_of_guests = request.form.get('number_of_guests')
-        room_id = request.form.get('room_id')
-        user_id = request.form.get('user_id')
+        room_id = request.form.get('room_id') or request.form.get('selected_rooms')
 
         # Fetch room to calculate total price
         room = Room.query.get(room_id)
@@ -103,7 +102,7 @@ def book_hotel():
 
         # Create booking
         booking = HotelBooking(
-            user_id=user_id,
+            user_id=current_user.id,
             room_id=room_id,
             check_in_date=datetime.strptime(check_in_date, '%Y-%m-%d'),
             check_out_date=datetime.strptime(check_out_date, '%Y-%m-%d'),
@@ -113,7 +112,7 @@ def book_hotel():
         db.session.add(booking)
         db.session.commit()
 
-        return redirect(url_for('hotel.booking_success'))
+        return redirect(url_for('payment.start_hotel_checkout', booking_id=booking.id))
 
     rooms = _filter_rooms(request.args)
     return render_template('hotel_booking.html', rooms=rooms, nav_links=hotel_booking_links, flash=flash)

@@ -106,7 +106,7 @@ select:focus {
 label {
     font-size: 14px;
     text-align: left;
-    color: #bbb;
+    color: #000000;
     margin-top: 10px;
 }
 
@@ -146,5 +146,12 @@ button:hover {
 }
 
 
+/*change the placeholder color*/
+::placeholder {
+    color: #000000 !important;
+}
 
-
+/*chnage the color of the typed text*/
+input {
+    color: #000000 !important;
+}

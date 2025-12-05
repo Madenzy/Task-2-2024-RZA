@@ -66,7 +66,7 @@
           <label for="check_out_date">Check-out date</label>
           <input type="date" id="check_out_date" name="check_out_date" required>
         </div>
-        <button class="search-btn" type="submit">Search</button>
+        <button class="search-btn" type="submit" formnovalidate>Search</button>
       </div>
 
       <div class="rooms-panel">
@@ -79,7 +79,7 @@
             {% for room in rooms %}
               <div>
                 <!--display rooms in radio boxes-->
-                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}">
+                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}" required>
                 <label for="room_{{ room.id }}">{{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds, {{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})</label>
                 
               </div>
@@ -99,7 +99,7 @@
 
     <div class="actions">
       <button type="button">Add zoo ticket</button>
-      <a href="{{url_for('booking.make_payment')}}" class="primary">Continue to payment</a>
+      <button class="primary" type="submit" formmethod="post">Continue to payment</button>
     </div>
   </form>
 </div>

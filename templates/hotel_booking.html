@@ -72,9 +72,11 @@
           {% if rooms %}
             {% for room in rooms %}
               <div>
-                <input type="checkbox" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}">
-                {{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds,
-                £{{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})
+                <!--display rooms in radio boxes-->
+                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}>
+                <label for="room_{{ room.id }}">{{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds,
+                £{{ "{:.2f}".format(room.price_per_night) }} night ({{ room.room_type }})</label>
+                
               </div>
             {% endfor %}
           {% else %}

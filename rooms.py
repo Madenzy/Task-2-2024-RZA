@@ -5,6 +5,7 @@ from models import db, Room
 
 def _default_rooms():
    #hotel rooms to seed.
+   #maximum of 6 bedrooms max capacity 4 people per room. max beds 4 per room.
   
     return [
         {
@@ -56,6 +57,66 @@ def _default_rooms():
             "beds": 2,
             "bedrooms": 1,
             "description": "Suite with lounge area and premium amenities.",
+        },
+        {
+            "id": "305",
+            "room_type": "suite",
+            "capacity": 4,
+            "price_per_night": 300.00,
+            "bathrooms": 2,
+            "beds": 3,
+            "bedrooms": 2,
+            "description": "Luxury suite with two bedrooms and city view.",
+        }
+        {
+            "id": "130",
+            "room_type": "single",
+            "capacity": 1,
+            "price_per_night": 90.00,
+            "bathrooms": 1,
+            "beds": 1,
+            "bedrooms": 1,
+            "description": "Economy single room with essential amenities.",
+        }
+        {
+            "id": "210",
+            "room_type": "double",
+            "capacity": 2,
+            "price_per_night": 140.00,
+            "bathrooms": 1,
+            "beds": 1,
+            "bedrooms": 1,
+            "description": "Deluxe double room with modern decor.",
+        },
+        {
+            "id": "220",
+            "room_type": "double",
+            "capacity": 2,
+            "price_per_night": 150.00,
+            "bathrooms": 1,
+            "beds": 2,
+            "bedrooms": 1,
+            "description": "Double room with two beds and garden view.",
+        },
+        {
+            "id": "320",
+            "room_type": "suite",
+            "capacity": 3,
+            "price_per_night": 280.00,
+            "bathrooms": 2,
+            "beds": 2,
+            "bedrooms": 1,
+            "description": "Executive suite with work area and premium services.",
+        },
+        {
+            "id": "330",
+            "room_type": "suite",
+            "capacity": 4,
+            "price_per_night": 320.00,
+            "bathrooms": 2,
+            "beds": 3,
+            "bedrooms": 2,
+            "description": "Presidential suite with luxurious amenities and panoramic views.",
         },
     ]
 

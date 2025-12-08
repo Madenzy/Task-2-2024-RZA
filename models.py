@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+
 from flask_login import UserMixin
 from datetime import datetime
 
@@ -102,3 +103,12 @@ class TicketPrice(db.Model):
 
     def get_id(self):
         return f"ticketprice-{self.id}"
+
+#-------------credit cards ------------
+class payment_cards(db.Model):
+    __tablename__ = 'cards'
+    Card_Number = db.Column(db.Integer, primary_key=True)
+    Card_Holder_name = db.Column(db.String(100))
+    CVC = db.Column(db.Integer)
+    Expiry = db.Column(db.String(8))
+    Card_Type = db.Column(db.String(50))

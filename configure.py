@@ -5,14 +5,21 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+# Use a single, consistent SQLite file inside the Flask instance folder.
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+DB_PATH = os.path.join(INSTANCE_DIR, "rza_task_2.db")
+
+
 class Config:
     SECRET_KEY = 'RZA_Task_2_Secret_Key'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///rza_task_2.db' 
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     #
 def configure_app(app: Flask):
+    os.makedirs(INSTANCE_DIR, exist_ok=True)
     app.secret_key = 'RZA_Task_2_Secret_Key'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///rza_task_2.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_PATH}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 

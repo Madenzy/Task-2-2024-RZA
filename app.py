@@ -13,10 +13,9 @@ load_dotenv()
 from werkzeug.security import generate_password_hash
 from models import db, Student
 from configure import configure_app
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from bookings import hotel_bp, booking_bp
 from authentication import auth_bp, login_manager
-from payment import payment_bp
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
@@ -26,8 +25,8 @@ login_manager.login_view = 'auth.login'
 
 app.register_blueprint(hotel_bp)
 app.register_blueprint(auth_bp)
+# booking_bp only contains a placeholder route; keep it registered for now.
 app.register_blueprint(booking_bp)
-app.register_blueprint(payment_bp)
 
 
 
@@ -95,19 +94,22 @@ with app.app_context():
         else:
             print('Admin user already exists.')
 
-
+#----- home route----
 @app.route('/')
 def home():
     return render_template('index.html', nav_links=home_links)
 
+#-------- about us -------
 @app.route('/about-us')
 def about_us():
     return render_template('about-us.html', nav_links=about_us_links)
 
+#----- privacy policy --------
 @app.route('/privacy')
 def privacy():
     return render_template('privacy.html', nav_links=privacy_links)
 
+#----- the animals -----
 @app.route('/the_animals')
 def the_animals():
     return render_template('the_animals.html', nav_links=about_us_links)
@@ -164,9 +166,8 @@ def failure():
 @app.route('/hotel_booking')
 @login_required
 def hotel_booking():
-    #add the functions from bookings.py to filter rooms based on user input
-
-    return render_template('hotel_booking.html', nav_links=hotel_booking_links)
+    # Redirect to blueprint handler so rooms/search logic is reused.
+    return redirect(url_for('hotel.book_hotel'))
 
 @app.route('/manage_zoo')
 @login_required

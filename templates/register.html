@@ -42,4 +42,57 @@
     {% endif %}
 </div>
 <script src="/static/Js/register.js"></script>
+<script>
+    document.getElementById('register-form').addEventListener('submit', function(event) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirm_password').value;
+        var errorContainer = document.getElementById('error-container');
+        errorContainer.innerHTML = '';
+
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            var errorMsg = document.createElement('p');
+            errorMsg.style.color = 'red';
+            errorMsg.textContent = 'Passwords do not match.';
+            errorContainer.appendChild(errorMsg);
+        }
+    });
+
+   
+    //validate as they type the password and confirm password fields
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirm_password').value;
+        var errorContainer = document.getElementById('error-container');
+        errorContainer.innerHTML = '';
+
+        if (password !== confirmPassword) {
+            var errorMsg = document.createElement('p');
+            errorMsg.style.color = 'red';
+            errorMsg.textContent = 'Passwords do not match.';
+            errorContainer.appendChild(errorMsg);
+        }
+    });
+    //1. password has uppercase
+    document.getElementById('password').addEventListener('input', function() {
+        var password = document.getElementById('password').value;
+        var message = '';
+        if (!/[A-Z]/.test(password)) {
+            message += 'Password must contain at least one uppercase letter.<br>';
+        }
+        if (!/[a-z]/.test(password)) {
+            message += 'Password must contain at least one lowercase letter.<br>';
+        }
+        if (!/[0-9]/.test(password)) {
+            message += 'Password must contain at least one number.<br>';
+        }
+        if (password.length < 8) {
+            message += 'Password must be at least 8 characters long.<br>';
+        }
+        document.getElementById('passwordMessage').innerHTML = message;
+    });
+</script>
+
+
+
 {% endblock %}

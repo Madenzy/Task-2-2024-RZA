@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block head %}Zoo Payment{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="/static/Css/PAYMENT.css">
+<div class="payment-page">
+    <div class="payment-container">
+
+        <!-- PRICE BREAKDOWN SIDEBAR -->
+        <div class="amount-box">
+            <h1>Zoo Payment</h1>
+            <p class="amount-meta">Review your charges before paying.</p>
+
+            <div class="amount-row">
+                <span>Base Price</span>
+                <strong>£ {{ ticket.total_price }}</strong>
+            </div>
+
+            <div class="amount-row">
+                <span>VAT</span>
+                <strong>£ {{ VAT }}</strong>
+            </div>
+            <div class="amount-row">
+                <span>Fee</span>
+                <strong>£ {{ fee }}</strong>
+            </div>
+
+            <div class="total-row">
+                <span class="label">Total</span>
+                <span class="amount">£ {{ total_amount }}</span>
+            </div>
+        </div>
+
+        <!-- PAYMENT FORM -->
+        <div class="payment-box">
+            <h2>Enter Your Payment Details</h2>
+
+            <form action="{{ url_for('zoo.process_payment', ticket_id=ticket.id) }}" method="POST">
+                <div class="form-group">
+                    <label for="Card_Holder_name">Cardholder's Name</label>
+                    <input id="Card_Holder_name" type="text" name="Card_Holder_name" placeholder="Card Holder Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="Card_Number">Card Number</label>
+                    <input id="Card_Number" type="text" name="Card_Number" placeholder="0000 0000 0000 0000" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Expiry">Expiry</label>
+                        <input id="Expiry" type="month" name="Expiry" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="CVC">CVC</label>
+                        <input id="CVC" type="text" name="CVC" placeholder="123" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="pay-btn">Pay £{{ total_amount }}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

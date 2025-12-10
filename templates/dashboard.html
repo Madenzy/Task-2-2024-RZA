@@ -3,7 +3,12 @@
 
 {% block body %}
 <link rel="stylesheet" href="/static/Css/dashboard.css">
+<style>
+  .card ul{
+    list-style: none;
 
+  }
+</style>
 <section>
   <div class="dashboard-container">
     <div class="top-bar">
@@ -53,12 +58,22 @@
       <div class="cards-column">
         <div class="column-title">Upcoming Bookings</div>
         <div class="card">
-          Zoo for 13/12/2025<br>
-          <br>
-          <button class="booking-btn">manage</button>
+            {% if hotel_bookings %}
+                    {% for b in hotel_bookings %}
+                        <ul>
+                            <td>
+                            <li>Hotel booking for {{ b.check_in_date }} <button class="booking-btn"> <a href="{{ url_for('hotel.manage_hotel') }}">manage</a></button></li>
+                        </ul>
+                    {% endfor %}
+            {% else %}
+                <p>You have no hotel bookings yet.</p>
+            {% endif %}
+          
         </div>
       </div>
     </div>
   </div>
+  
+
 <section>
 {% endblock %}

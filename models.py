@@ -107,7 +107,7 @@ class TicketPrice(db.Model):
 #-------------credit cards ------------
 class payment_cards(db.Model):
     __tablename__ = 'cards'
-    Card_Number = db.Column(db.Integer, primary_key=True)
+    Card_Number = db.Column(db.String, primary_key=True)
     Card_Holder_name = db.Column(db.String(100))
     CVC = db.Column(db.Integer)
     Expiry = db.Column(db.String(8))

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash , session
 from datetime import datetime, date
 import os
 import re
@@ -11,11 +11,12 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 load_dotenv() 
 from werkzeug.security import generate_password_hash
-from models import db, Student
+from models import db, Student, HotelBooking , Ticket
 from configure import configure_app
 from flask_login import login_required, current_user, logout_user
 from bookings import hotel_bp, booking_bp
 from authentication import auth_bp, login_manager
+from zoo import zoo_bp
 
 app = Flask(__name__)
 app.secret_key = 'RZA_Task_2_Secret_Key'
@@ -27,6 +28,7 @@ app.register_blueprint(hotel_bp)
 app.register_blueprint(auth_bp)
 # booking_bp only contains a placeholder route; keep it registered for now.
 app.register_blueprint(booking_bp)
+app.register_blueprint(zoo_bp)
 
 
 
@@ -122,7 +124,8 @@ def dashboard():
         db.text("SELECT * FROM users WHERE id = :id"),
         {"id": current_user.id}
     ).fetchone()
-
+    #the ratings
+    user_ratings = session.get("ratings", {})
     if not user:
         flash('User not found.', 'danger')
         return redirect(url_for('auth.login'))
@@ -131,14 +134,21 @@ def dashboard():
         flash('Access denied. Admins cannot access user dashboard.', 'danger')
         return redirect(url_for('admin_dashboard'))
 
-    
+    hotel_bookings = HotelBooking.query.filter_by(user_id=current_user.id).all()
+
+    try:
+        zoo_bookings = Ticket.query.filter_by(user_id=current_user.id).all()
+    except:
+        zoo_bookings = []  # in case ZooBooking doesn't exist
 
     return render_template(
-        'dashboard.html',
+        "dashboard.html",
+        hotel_bookings=hotel_bookings,
+        zoo_bookings=zoo_bookings,
         nav_links=dashboard_links,
-        user=user,
-        
-    )
+        user = user
+    )           
+
 
 
 @app.route('/admin_dashboard')

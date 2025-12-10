@@ -1,6 +1,6 @@
 from datetime import datetime, date
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash , session
+from flask_login import login_required, current_user 
 from sqlalchemy import and_
 
 from models import db, HotelBooking, Room, payment_cards
@@ -154,10 +154,19 @@ def book_hotel():
     return render_template("hotel_booking.html", rooms=rooms, nav_links=hotel_booking_links, flash=flash)
 
 
-@hotel_bp.route("/booking_success")
+@hotel_bp.route("/booking_success/<int:booking_id>", methods=["GET", "POST"])
 @login_required
-def booking_success():
-    return render_template("booking_success.html", nav_links=hotel_booking_links)
+def booking_success(booking_id):
+    """Show confirmation for a specific booking."""
+    booking = HotelBooking.query.get_or_404(booking_id)
+    room = Room.query.get(booking.room_id)
+    users = current_user
+    # Only the owner or an admin can view.
+    if booking.user_id != current_user.id and getattr(current_user, "role", "") != "admin":
+        flash("You cannot view this booking.", "danger")
+        return redirect(url_for("dashboard"))
+
+    return render_template("success.html", nav_links=hotel_booking_links, booking=booking, room=room , users=users)
 
 
 
@@ -167,20 +176,87 @@ def booking_success():
 @login_required
 def manage_hotel():
     bookings = HotelBooking.query.all()
+
     return render_template("manage_hotel.html", bookings=bookings, nav_links=hotel_booking_links)
+
+@hotel_bp.route("/refund_booking/<int:booking_id>", methods=["POST"])
+@login_required
+def refund_booking(booking_id):
+    booking = HotelBooking.query.get_or_404(booking_id)
+
+    if booking.user_id != current_user.id and getattr(current_user, "role", "") != "admin":
+        flash("You do not have permission to refund this booking.", "danger")
+        return redirect(url_for("dashboard"))
+
+    if booking.payment_status != "paid":
+        flash("Only paid bookings can be refunded.", "warning")
+        return redirect(url_for("dashboard"))
+
+    # Mark refunded
+    booking.payment_status = "refunded"
+
+    # free the room
+    room = Room.query.get(booking.room_id)
+    if room:
+        room.availability = True
+
+    db.session.commit()
+
+    flash("Refund requested successfully.", "success")
+    return redirect(url_for("dashboard"))
+
 
 
 @hotel_bp.route("/cancel_booking/<int:booking_id>", methods=["POST"])
 @login_required
 def cancel_booking(booking_id):
-    booking = HotelBooking.query.get(booking_id)
-    if booking:
-        _release_pending_booking(booking)
-        flash("Booking cancelled successfully.", "success")
-    else:
-        flash("Booking not found.", "danger")
+    booking = HotelBooking.query.get_or_404(booking_id)
+
+    if booking.user_id != current_user.id:
+        flash("Unauthorized.", "danger")
+        return redirect(url_for("hotel.manage_hotel"))
+
+    # Already cancelled
+    if booking.cancellation_status == "cancelled":
+        flash("Booking already cancelled.", "info")
+        return redirect(url_for("hotel.manage_hotel"))
+
+    # Too late to cancel
+    if date.today() >= booking.check_in_date:
+        flash("You cannot cancel after the check-in date.", "danger")
+        return redirect(url_for("hotel.manage_hotel"))
+
+    booking.cancellation_status = "cancelled"
+
+    # If paid, move into refund request state
+    if booking.payment_status == "paid":
+        booking.refund_status = "requested"
+
+    # Free room
+    room = Room.query.get(booking.room_id)
+    room.availability = True
+
+    db.session.commit()
+
+    flash("Booking cancelled successfully.", "success")
     return redirect(url_for("hotel.manage_hotel"))
 
+@hotel_bp.route("/rate_booking/<int:booking_id>", methods=["POST"])
+@login_required
+def rate_booking(booking_id):
+    rating = request.form.get("rating")
+
+    if not rating:
+        flash("Please select a rating.", "danger")
+        return redirect(url_for("dashboard"))
+
+    # store temporarily in session
+    ratings = session.get("ratings", {})
+    ratings[str(booking_id)] = rating
+    session["ratings"] = ratings
+
+    flash("Thank you for your rating!", "success")
+    return redirect(url_for("dashboard"))
 
 @hotel_bp.route("/hotel_pay/<int:booking_id>", methods=["GET"])
 @login_required
@@ -194,7 +270,7 @@ def start_payment(booking_id):
 
     if booking.payment_status == "paid":
         flash("Booking already paid.", "info")
-        return redirect(url_for("hotel.booking_success"))
+        return redirect(url_for("hotel.booking_success", booking_id=booking.id))
 
     amount, VAT, fee_fee, fyd_fee, total_amount = _amounts(booking)
 
@@ -220,7 +296,7 @@ def process_payment(booking_id):
 
     if booking.payment_status == "paid":
         flash("Booking already paid.", "info")
-        return redirect(url_for("hotel.booking_success"))
+        return redirect(url_for("hotel.booking_success", booking_id=booking.id))
 
     number_raw = (request.form.get("Card_Number") or "").replace(" ", "")
     expiry = (request.form.get("Expiry") or "").strip()
@@ -248,7 +324,7 @@ def process_payment(booking_id):
     db.session.commit()
 
     flash("Payment complete. Thank you!", "success")
-    return redirect(url_for("hotel.booking_success"))
+    return redirect(url_for("hotel.booking_success", booking_id=booking.id))
 
 
 def init_app(app):

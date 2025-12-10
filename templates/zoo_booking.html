@@ -159,7 +159,10 @@
 
       <div class="actions">
         <button type="button" class="secondary">Add Hotel booking</button>
-        <button type="submit">Continue to payment</button>
+        <button class="primary" type="submit" formmethod="post" formaction="{{ url_for('zoo_booking') }}">
+  Continue to payment
+</button>
+
       </div>
     </form>
   </div>

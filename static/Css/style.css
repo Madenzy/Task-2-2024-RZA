@@ -98,3 +98,35 @@ button {
     transition: all 0.25s ease-in-out;
     margin-top: 10px;
 }
+
+.flash-container {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.flash {
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-weight: 600;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    backdrop-filter: blur(6px);
+}
+
+.flash-success {
+    border-color: #6ee7b7;
+    background: rgba(57, 186, 133, 0.2);
+    color: #e5fff3;
+}
+
+.flash-danger {
+    border-color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.18);
+    color: #ffe5e5;
+}

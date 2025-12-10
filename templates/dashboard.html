@@ -9,6 +9,34 @@
 
   }
 </style>
+<style>
+.column-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.booking-btn {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.booking-btn:hover {
+    background-color: #2980b9;
+}
+</style>
 <section>
   <div class="dashboard-container">
     <div class="top-bar">
@@ -68,6 +96,23 @@
             {% else %}
                 <p>You have no hotel bookings yet.</p>
             {% endif %}
+          
+        </div>
+        <div class="cards-column">
+        <div class="column-title">Upcoming Zoo Bookings</div>
+          <div class="card">
+              {% if zoo_bookings %}
+                  <ul>
+                      {% for b in zoo_bookings %}
+                      <td>
+                          <li>
+                              ZOO booking for {{ b.visit_date.strftime('%A, %B %d, %Y') }} -<a href="{{ url_for('zoo.manage_zoo') }}" class="booking-btn">Manage</a></li>
+                      {% endfor %}
+                  </ul>
+              {% else %}
+                  <p>You have no upcoming zoo bookings yet.</p>
+              {% endif %}
+          </div>
           
         </div>
       </div>

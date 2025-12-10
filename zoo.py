@@ -130,12 +130,13 @@ def process_payment(ticket_id):
 @login_required
 def booking_success(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
+    user = current_user
 
     if ticket.user_id != current_user.id:
         flash("You cannot view this ticket.", "danger")
         return redirect(url_for("dashboard"))
 
-    return render_template("zoo_success.html", ticket=ticket, nav_links=nav_links)
+    return render_template("zoo_success.html", ticket=ticket, nav_links=nav_links, user=user)
 
 
 def init_app(app):

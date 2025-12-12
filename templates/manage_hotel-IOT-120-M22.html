@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block head %}Manage Hotel{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        background-image: url(/static/images/jordan-heinrichs-UpA6QvGpLHc-unsplash.jpg);
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 16px;
+    }
+    .btn {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+    }
+    .page-wrap{
+        max-width: 900px;
+    }
+    /* Table container */
+.glass-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+/* Table headers */
+.glass-panel table thead {
+    background-color: #4a90e2;
+    color: white;
+}
+
+.glass-panel table thead th {
+    padding: 12px 8px;
+    text-align: left;
+}
+
+/* Table rows */
+.glass-panel table tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background 0.3s;
+}
+
+.glass-panel table tbody tr:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* Table cells */
+.glass-panel table tbody td {
+    padding: 10px 8px;
+    vertical-align: middle;
+}
+
+/* Buttons inside table */
+.glass-panel .btn {
+    padding: 4px 8px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    color: rgb(35, 14, 110);
+}
+
+
+/* Responsive actions cell */
+td form, td a {
+    display: inline-block;
+    margin-right: 4px;
+    margin-bottom: 2px;
+}
+
+    
+</style>
+
+<section class="page-wrap">
+  <div class="glass-panel">
+    <h1>Hotel Bookings</h1>
+
+    {% if bookings %}
+      <table class="table table-striped" style="width:100%; margin-top: 12px;">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Room</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Guests</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.user_id }}</td>
+            <td>{{ b.room_id }}</td>
+            <td>{{ b.check_in_date }}</td>
+            <td>{{ b.check_out_date }}</td>
+            <td>{{ b.number_of_guests }}</td>
+            <td>£{{ b.total_price}}</td>
+            <td>{{ b.payment_status|capitalize }}</td>
+            <td style="display:flex; gap:6px; flex-wrap: wrap;">
+              
+              {# --- Pay (only if pending) --- #}
+              {% if b.payment_status == "pending" %}
+                <a class="btn btn-success btn-sm" href="{{ url_for('hotel.start_payment', booking_id=b.id) }}">Pay</a>
+              {% endif %}
+              
+              {# --- Cancel (only if not paid) --- #}
+              {% if b.payment_status != "paid" %}
+                <form action="{{ url_for('hotel.cancel_booking', booking_id=b.id) }}" method="POST" style="display:inline;">
+                  <button class="btn btn-danger btn-sm">Cancel</button>
+                </form>
+              {% endif %}
+              
+              {# --- Refund (only if paid and not refunded) --- #}
+              {% if b.payment_status == "paid" %}
+                <form action="{{ url_for('hotel.refund_booking', booking_id=b.id) }}" method="POST" style="display:inline;">
+                  <button class="btn btn-warning btn-sm">Refund</button>
+                </form>
+              {% endif %}
+              
+              {# --- View Booking --- #}
+              {% if b.payment_status == "paid" or b.payment_status == "refunded" %}
+                <a class="btn btn-primary btn-sm" href="{{ url_for('hotel.booking_success', booking_id=b.id) }}">View</a>
+              {% endif %}
+
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No bookings yet.</p>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

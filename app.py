@@ -117,6 +117,7 @@ def the_animals():
     return render_template('the_animals.html', nav_links=about_us_links)
 
 
+
 @app.route('/dashboard')
 @login_required
 def dashboard():

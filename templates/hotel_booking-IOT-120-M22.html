@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block head %}Hotel booking{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="/static/Css/hotel.css">
+
+<!--the flash errors on top-->
+<style>
+    flash-message {
+        color: red;
+    }
+</style>
+<div class="page-wrap">
+  <form class="hotel-shell" id="hotel-search-form" action="{{ url_for('hotel.book_hotel') }}" method="get">
+    
+    <div class="glass-panel">
+      <h1>Hotel Booking</h1>
+    </div>
+
+    <!-- Sidebar filters -->
+    <aside class="filter-card">
+      <h3>Add Search Criteria</h3>
+
+      <!-- Bedrooms -->
+      <div class="filter-field">
+        <span class="filter-label">Bedrooms</span>
+        <div class="stepper">
+          <button type="button" aria-label="Decrease bedrooms">-</button>
+          <input 
+            type="number" 
+            id="bedrooms" 
+            name="bedrooms" 
+            value="{{ request.args.get('bedrooms', 1) }}" 
+            min="0" step="1">
+          <button type="button" aria-label="Increase bedrooms">+</button>
+        </div>
+      </div>
+
+      <!-- Bathrooms -->
+      <div class="filter-field">
+        <span class="filter-label">Bathrooms</span>
+        <div class="stepper">
+          <button type="button" aria-label="Decrease bathrooms">-</button>
+          <input 
+            type="number" 
+            id="bathrooms" 
+            name="bathrooms" 
+            value="{{ request.args.get('bathrooms', 1) }}" 
+            min="0" step="1">
+          <button type="button" aria-label="Increase bathrooms">+</button>
+        </div>
+      </div>
+
+      <!-- Beds -->
+      <div class="filter-field">
+        <span class="filter-label">Beds</span>
+        <div class="stepper">
+          <button type="button" aria-label="Decrease beds">-</button>
+          <input 
+            type="number" 
+            id="beds" 
+            name="beds" 
+            value="{{ request.args.get('beds', 1) }}" 
+            min="0" step="1">
+          <button type="button" aria-label="Increase beds">+</button>
+        </div>
+      </div>
+
+      <!-- Room Type -->
+      <div class="filter-field select-field">
+        <span class="filter-label">Room Type</span>
+        <select id="room_type" name="room_type">
+          <option value="" {% if not request.args.get('room_type') %}selected{% endif %}>Any</option>
+          <option value="family" {% if request.args.get('room_type') == 'family' %}selected{% endif %}>Family</option>
+          <option value="single" {% if request.args.get('room_type') == 'single' %}selected{% endif %}>Single</option>
+          <option value="double" {% if request.args.get('room_type') == 'double' %}selected{% endif %}>Double</option>
+          <option value="suite" {% if request.args.get('room_type') == 'suite' %}selected{% endif %}>Suite</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- Main search and results -->
+    <main class="booking-card">
+      <div class="pill-group">
+
+        <!-- Number of guests -->
+        <div class="pill-1">
+          <label for="number_of_guests">Number of people</label>
+          <input 
+            type="number" 
+            id="number_of_guests" 
+            name="number_of_guests" 
+            value="{{ request.args.get('number_of_guests', 1) }}" 
+            min="1" required>
+        </div>
+
+        <!-- Check-in date -->
+        <div class="pill">
+          <label for="check_in_date">Check-in date</label>
+          <input 
+            type="date" 
+            id="check_in_date" 
+            name="check_in_date" 
+            value="{{ request.args.get('check_in_date', '') }}" 
+            required>
+        </div>
+
+        <!-- Check-out date -->
+        <div class="pill">
+          <label for="check_out_date">Check-out date</label>
+          <input 
+            type="date" 
+            id="check_out_date" 
+            name="check_out_date" 
+            value="{{ request.args.get('check_out_date', '') }}" 
+            required>
+        </div>
+
+        <button class="search-btn" type="submit" formnovalidate>Search</button>
+      </div>
+
+      <!-- Rooms list -->
+      <div class="rooms-panel">
+        <div class="rooms-head">
+          <span>Select Room:</span>
+          <span>Room type: {{ request.args.get('room_type', 'Any')|capitalize }}</span>
+        </div>
+        <div class="rooms-list">
+          {% if rooms %}
+            {% for room in rooms %}
+              <div>
+                <input type="radio" id="room_{{ room.id }}" name="selected_rooms" value="{{ room.id }}" required>
+                <label for="room_{{ room.id }}">
+                  {{ room.bedrooms }} bedrooms, {{ room.bathrooms }} bathrooms, {{ room.beds }} beds, 
+                  £{{ "{:.2f}".format(room.price_per_night) }} per night ({{ room.room_type }})
+                </label>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div>No rooms match your criteria yet.</div>
+          {% endif %}
+        </div>
+        <div class="link"><a href="{{ url_for('hotel.book_hotel') }}">Reset filters</a></div>
+      </div>
+    </main>
+
+    <!-- Room preview -->
+    <div class="room-preview">
+      <h3>Room Preview</h3>
+      <div class="caption"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button type="button">Add zoo ticket</button>
+      <button class="primary" type="submit" formmethod="post" formaction="{{ url_for('hotel.book_hotel') }}">Continue to payment</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // Stepper buttons functionality
+  document.querySelectorAll('.stepper').forEach(stepper => {
+    const decreaseBtn = stepper.querySelector('button[aria-label^="Decrease"]');
+    const increaseBtn = stepper.querySelector('button[aria-label^="Increase"]');
+    const input = stepper.querySelector('input[type="number"]');
+
+    decreaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(input.value);
+      if (currentValue > parseInt(input.min)) {
+        input.value = currentValue - parseInt(input.step);
+      }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+      let currentValue = parseInt(input.value);
+      input.value = currentValue + parseInt(input.step);
+    });
+  });
+
+  // Update room preview based on selected room type and add an image
+  
+  const roomTypeSelect = document.getElementById('room_type');
+  const caption = document.querySelector('.caption');
+  roomTypeSelect.addEventListener('change', () => {
+    const selectedType = roomTypeSelect.value;
+    let captionText = '';
+    switch (selectedType) {
+      case 'family':
+        captionText = 'Family Room: Designed for parents and children, typically with multiple beds, sometimes subdivided for privacy.';
+        break;
+      case 'single':
+        captionText = 'Single Room: Ideal for solo travelers, featuring one bed and essential amenities for a comfortable stay.';
+        break;
+      case 'double':
+        captionText = 'Double Room: Perfect for couples or friends, equipped with two beds and additional space for relaxation.';
+        break;
+      case 'suite':
+        captionText = 'Suite: Luxurious accommodation with separate living areas, premium amenities, and enhanced comfort.';
+        break;
+      default:
+        captionText = '';
+    }
+    caption.textContent = captionText;
+  });
+  // Trigger change event on page load to set initial caption
+  roomTypeSelect.dispatchEvent(new Event('change'));
+
+  // Set minimum check-in date to today
+  const checkInDate = document.getElementById('check_in_date');
+  const today = new Date().toISOString().split('T')[0];
+  checkInDate.setAttribute('min', today);
+
+  // Set minimum check-out date based on check-in date
+  const checkOutDate = document.getElementById('check_out_date'); 
+  checkInDate.addEventListener('change', () => {
+    const checkIn = new Date(checkInDate.value);
+    const minCheckOut = new Date(checkIn);
+    minCheckOut.setDate(minCheckOut.getDate() + 1);
+    checkOutDate.setAttribute('min', minCheckOut.toISOString().split('T')[0]);
+  });
+
+  // Trigger change event on page load to set initial min check-out date
+  checkInDate.dispatchEvent(new Event('change'));
+  
+  // do not search without dates
+  document.getElementById('hotel-search-form').addEventListener('submit', function(event) {
+    const checkIn = document.getElementById('check_in_date').value;
+    const checkOut = document.getElementById('check_out_date').value;
+    if (!checkIn || !checkOut) {
+      event.preventDefault();
+      alert('Please select both check-in and check-out dates before searching.');
+    }
+  });
+  
+
+</script>
+
+{% endblock %}

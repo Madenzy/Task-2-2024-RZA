@@ -86,12 +86,13 @@ class Reward(db.Model):
     __tablename__ = 'rewards'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    rewards_level = db.Column(db.Integer)
+    rewards_points = db.Column(db.Integer, default=0)
+    rewards_level = db.Column(db.String(50), default="Bronze")
     rewards_points = db.Column(db.Integer)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
+    
     user = db.relationship('Student', backref='rewards')
-
+    
 
 # ------------------ Ticket Prices ------------------
 class TicketPrice(db.Model):
@@ -112,3 +113,40 @@ class payment_cards(db.Model):
     CVC = db.Column(db.Integer)
     Expiry = db.Column(db.String(8))
     Card_Type = db.Column(db.String(50))
+
+@property
+def next_level_name(self):
+    levels = ["Bronze", "Silver", "Gold", "Platinum"]
+    current_index = levels.index(self.rewards_level)
+    return levels[current_index + 1] if current_index < len(levels)-1 else "MAX"
+ 
+@property
+def points_to_next_level(self):
+    thresholds = {
+        "Bronze": 100,
+        "Silver": 250,
+        "Gold": 500,
+        "Platinum": None
+    }
+    next_threshold = thresholds.get(self.rewards_level)
+ 
+    if next_threshold is None:
+        return 0
+ 
+    return max(0, next_threshold - self.rewards_points)
+ 
+@property
+def next_level_progress_percent(self):
+    thresholds = {
+        "Bronze": 100,
+        "Silver": 250,
+        "Gold": 500,
+        "Platinum": 500
+    }
+ 
+    current_threshold = thresholds[self.rewards_level]
+    if self.rewards_level == "Platinum":
+        return 100
+ 
+    progress = (self.rewards_points / current_threshold) * 100
+    return min(100, round(progress, 2))

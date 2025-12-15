@@ -1,0 +1,249 @@
+1. Introduction and Objectives
+
+This feedback plan outlines the structured approach that will be used to gather meaningful feedback on the GibJohn Tutoring prototype. The prototype is a multi-role tutoring platform designed to support students, tutors, parents, and administrators. Key features include user registration and authentication, student dashboards, assignment submission, tutor resource management, progress tracking, XP-based gamification, and role-based access control.
+
+The purpose of gathering feedback is to ensure that the prototype meets the requirements outlined by GibJohn and is suitable for its intended users. Feedback will be used to evaluate both the usability and technical quality of the system and to identify areas for refinement.
+
+The objectives of this feedback process are to:
+
+Evaluate how effectively the prototype meets GibJohn’s functional and non-functional requirements
+
+Identify usability and accessibility issues experienced by real users
+
+Assess the technical implementation, including code structure, security, and performance
+
+Collect evidence-informed data to support improvements and future development
+
+Ensure the solution meets the needs of both technical and non-technical stakeholders
+
+This plan demonstrates a systematic and professional methodology for gathering high-quality, actionable feedback over a defined timeframe.
+
+2. Identification of Target Audiences
+
+To ensure comprehensive coverage of all aspects of the prototype, feedback will be collected from a range of technical and non-technical audiences. Each audience has been selected based on their relevance to the GibJohn Tutoring platform.
+
+Non-Technical Audiences
+Audience Type	Number	Rationale
+Students (11–14)	2	Primary end users; represent younger learners who will use quizzes, assignments, and dashboards
+Students (15–18)	1	Can evaluate content suitability and usability for older learners
+Parents	1	Will monitor student progress and safeguarding features
+Tutors	1	Will upload resources, create assignments, and grade submissions
+Technical Audiences
+Audience Type	Number	Rationale
+Programming Professional	1	Conducts code review to assess security, efficiency, and structure
+IT/Computing Peer	1	Provides a secondary technical perspective on implementation choices
+
+Total Participants: 7
+
+This mix ensures feedback is collected from all key stakeholder groups identified in the GibJohn brief, with particular focus on students as the primary users, while also incorporating technical validation of the system.
+
+3. Overview of Feedback Materials
+
+To gather structured and targeted feedback, a range of materials will be created, each designed for a specific audience and purpose.
+
+3.1 Screencasts / Demonstrations
+
+Non-Technical Screencast (3–5 minutes)
+
+Target Audience: Students, Parents, Tutors
+
+Purpose: Demonstrate how the system is used from a user perspective
+
+Coverage: Registration, dashboards, assignments, progress tracking, XP system, navigation
+
+Technical Screencast (5–7 minutes)
+
+Target Audience: Programming professional, IT peer
+
+Purpose: Explain technical decisions and implementation
+
+Coverage: Flask architecture, database models, authentication, validation, security measures, code organisation and comments
+
+3.2 Questionnaires
+
+Non-Technical Questionnaire
+
+Target Audience: Students, Parents, Tutors
+
+Focus Areas:
+
+Ease of use
+
+Interface clarity
+
+Feature usefulness
+
+Accessibility
+
+Question Types: Likert scale ratings, multiple choice, open-ended questions
+
+Technical Questionnaire
+
+Target Audience: Technical reviewers
+
+Focus Areas:
+
+Code quality
+
+Security practices
+
+Performance
+
+Maintainability
+
+Question Types: Technical ratings and open-ended responses
+
+3.3 User Observation Records
+
+Target Audience: Students
+
+Purpose: Identify usability issues that may not be verbally reported
+
+Method: Structured observation template tracking task completion time, errors, and confusion points
+
+3.4 Paired Coding Review Template
+
+Target Audience: Programming professional
+
+Purpose: Conduct a structured technical review of the codebase
+
+Coverage:
+
+Code readability
+
+Security implementation
+
+Efficiency
+
+Best practice compliance
+
+Each material is specifically designed to collect focused, high-quality feedback relevant to its audience.
+
+4. Feedback Gathering Methodology
+
+The feedback process will be carried out over one week and divided into clear phases to ensure organisation and consistency.
+
+Phase 1: Preparation and Distribution (Days 1–2)
+
+Actions:
+
+Finalise screencasts, questionnaires, and templates
+
+Create Google Forms for questionnaires
+
+Brief participants on the purpose of the feedback
+
+Distribute screencasts:
+
+Non-technical screencast sent to students, parents, and tutors
+
+Technical screencast sent to technical reviewers
+
+Phase 2: Feedback Collection (Days 3–5)
+
+Actions:
+
+Participants complete questionnaires independently
+
+Conduct supervised observation sessions with students
+
+Carry out paired code review session with programming professional
+
+Take structured notes during observations and reviews
+
+Phase 3: Collation and Initial Analysis (Days 6–7)
+
+Actions:
+
+Export questionnaire results to spreadsheets
+
+Organise qualitative feedback by theme
+
+Identify recurring issues and strengths
+
+Prepare feedback summaries for Task 3A evaluation
+
+5. Specific Tasks for Observation Sessions
+
+During observation sessions, students will be asked to complete realistic tasks independently.
+
+Task 1: Account Registration and Login
+
+Instruction:
+“Please create a student account and log into the system.”
+
+Rationale:
+Tests onboarding, validation, and navigation.
+
+Observations:
+
+Time taken
+
+Errors made
+
+Understanding of validation messages
+
+Task 2: Assignment Submission
+
+Instruction:
+“Submit an assignment for one of your courses.”
+
+Rationale:
+Tests a core functional requirement.
+
+Observations:
+
+Ease of file upload
+
+User confidence after submission
+
+Task 3: Viewing Progress and XP
+
+Instruction:
+“Check your progress and XP for your course.”
+
+Rationale:
+Tests dashboard clarity and engagement features.
+
+Observations:
+
+Ability to locate progress
+
+Understanding of XP system
+
+6. Data Collection and Recording Strategy
+Questionnaire Data
+
+Collected using Google Forms
+
+Exported to Excel
+
+Quantitative results averaged
+
+Qualitative responses grouped by theme
+
+Observation Notes
+
+Recorded using structured templates
+
+Timings measured
+
+Direct quotes noted
+
+Typed up immediately after sessions
+
+Code Review Feedback
+
+Completed using review template
+
+Additional notes taken during discussion
+
+Stored as: Code_Review_[Reviewer]_[Date].docx
+
+All data will be anonymised and stored securely to comply with ethical and GDPR requirements.
+
+7. Conclusion
+
+This feedback plan provides a structured, systematic approach to gathering high-quality feedback on the GibJohn Tutoring prototype. By involving both technical and non-technical stakeholders and using multiple feedback methods, the plan ensures comprehensive evaluation of usability, functionality, and technical implementation.
+
+The collected feedback will be analysed to identify strengths, weaknesses, and opportunities for improvement, directly informing refinements documented in Task 3A and recommendations presented in Task 3B.
